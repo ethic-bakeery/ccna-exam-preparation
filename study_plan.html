@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCNA 70-Day Battle Plan — Study Hacks & Exam Strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   ROOT — Brutalist Military Terminal
+═══════════════════════════════════ */
+:root {
+  --black:   #07080a;
+  --dark:    #0d1117;
+  --panel:   #111827;
+  --border:  #1f2937;
+  --lime:    #a3e635;
+  --lime2:   #84cc16;
+  --amber:   #fbbf24;
+  --red:     #ef4444;
+  --blue:    #38bdf8;
+  --purple:  #a78bfa;
+  --pink:    #f472b6;
+  --white:   #f9fafb;
+  --gray:    #9ca3af;
+  --gray2:   #4b5563;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.6;
+}
+
+/* ─── TYPOGRAPHY ─── */
+h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; line-height: 1.1; }
+code, .mono { font-family: 'Fira Code', monospace; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--lime2); border-radius: 2px; }
+
+/* ─── TOP NAV ─── */
+#topnav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(7,8,10,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 56px;
+}
+
+.nav-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--lime);
+  letter-spacing: 0.08em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 2px;
+  transition: all 0.2s;
+  letter-spacing: 0.06em;
+}
+
+.nav-links a:hover { color: var(--lime); background: rgba(163,230,53,0.08); }
+
+/* ─── PROGRESS BAR ─── */
+#reading-bar {
+  position: fixed;
+  top: 56px; left: 0;
+  height: 2px;
+  background: var(--lime);
+  z-index: 901;
+  transition: width 0.1s;
+  box-shadow: 0 0 8px var(--lime);
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 120px 64px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--black);
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(163,230,53,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(163,230,53,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridShift 20s linear infinite;
+}
+
+@keyframes gridShift {
+  0% { background-position: 0 0; }
+  100% { background-position: 60px 60px; }
+}
+
+.hero-corner {
+  position: absolute;
+  top: 80px; right: 64px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--gray2);
+  text-align: right;
+  line-height: 1.8;
+}
+
+.hero-corner span { color: var(--lime); }
+
+.hero-tag {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: var(--lime);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-tag::before {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--lime);
+}
+
+.hero h1 {
+  font-size: clamp(60px, 10vw, 130px);
+  color: var(--white);
+  position: relative;
+  z-index: 1;
+  line-height: 0.95;
+}
+
+.hero h1 .accent { color: var(--lime); }
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--gray);
+  max-width: 600px;
+  margin-top: 24px;
+  font-weight: 300;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  margin-top: 48px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-item {
+  border-left: 2px solid var(--lime);
+  padding-left: 16px;
+}
+
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--lime);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ─── SECTIONS ─── */
+section {
+  padding: 100px 64px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+section:nth-child(odd) { background: var(--dark); }
+
+.section-tag {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--lime);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-tag::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--lime);
+}
+
+.section-title {
+  font-size: clamp(36px, 5vw, 64px);
+  color: var(--white);
+  margin-bottom: 48px;
+}
+
+.section-title .accent { color: var(--lime); }
+
+/* ─── COUNTDOWN / OVERVIEW CARDS ─── */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.ov-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ov-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.ov-card.lime::before  { background: var(--lime); }
+.ov-card.amber::before { background: var(--amber); }
+.ov-card.blue::before  { background: var(--blue); }
+.ov-card.red::before   { background: var(--red); }
+.ov-card.purple::before{ background: var(--purple); }
+.ov-card.pink::before  { background: var(--pink); }
+
+.ov-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+
+.ov-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.ov-card.lime .ov-num  { color: var(--lime); }
+.ov-card.amber .ov-num { color: var(--amber); }
+.ov-card.blue .ov-num  { color: var(--blue); }
+.ov-card.red .ov-num   { color: var(--red); }
+.ov-card.purple .ov-num{ color: var(--purple); }
+.ov-card.pink .ov-num  { color: var(--pink); }
+
+.ov-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--gray);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ov-desc { font-size: 13px; color: var(--gray); margin-top: 8px; line-height: 1.5; }
+
+/* ─── DAILY SCHEDULE ─── */
+.schedule-block {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.schedule-header {
+  background: rgba(163,230,53,0.08);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sched-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  color: var(--lime);
+  letter-spacing: 0.06em;
+}
+
+.sched-time {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: var(--amber);
+  background: rgba(251,191,36,0.1);
+  border: 1px solid rgba(251,191,36,0.3);
+  padding: 3px 10px;
+  border-radius: 2px;
+}
+
+.schedule-body { padding: 20px; }
+
+.time-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.time-row:last-child { border-bottom: none; }
+
+.time-badge {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--black);
+  padding: 3px 10px;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.tb-lime   { background: var(--lime); }
+.tb-amber  { background: var(--amber); }
+.tb-blue   { background: var(--blue); }
+.tb-red    { background: var(--red); }
+.tb-purple { background: var(--purple); }
+.tb-gray   { background: var(--gray); }
+
+.time-content { font-size: 14px; color: var(--white); line-height: 1.6; }
+.time-content strong { color: var(--lime); }
+.time-content .note { color: var(--gray); font-size: 12px; font-family: 'Fira Code', monospace; margin-top: 4px; }
+
+/* ─── PHASE TABLE ─── */
+.phase-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.phase-table th {
+  background: rgba(163,230,53,0.1);
+  color: var(--lime);
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+.phase-table td {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  color: var(--gray);
+  vertical-align: top;
+}
+
+.phase-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+.phase-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.ph-1 { color: var(--lime); }
+.ph-2 { color: var(--amber); }
+.ph-3 { color: var(--blue); }
+.ph-4 { color: var(--red); }
+
+.tag-pill {
+  display: inline-block;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  margin: 2px;
+  border: 1px solid;
+}
+
+.tp-lime   { color: var(--lime);   border-color: rgba(163,230,53,0.4);  background: rgba(163,230,53,0.08); }
+.tp-amber  { color: var(--amber);  border-color: rgba(251,191,36,0.4);  background: rgba(251,191,36,0.08); }
+.tp-blue   { color: var(--blue);   border-color: rgba(56,189,248,0.4);  background: rgba(56,189,248,0.08); }
+.tp-red    { color: var(--red);    border-color: rgba(239,68,68,0.4);   background: rgba(239,68,68,0.08); }
+.tp-purple { color: var(--purple); border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.08); }
+
+/* ─── HACK CARDS ─── */
+.hacks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.hack-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hack-card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+
+.hack-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.hack-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  line-height: 1;
+  color: var(--gray2);
+  flex-shrink: 0;
+  width: 48px;
+}
+
+.hack-meta { flex: 1; }
+
+.hack-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--white);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.hack-cat {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.hack-body { padding: 16px 20px; font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+.hack-body ul { list-style: none; }
+.hack-body ul li {
+  padding: 4px 0;
+  padding-left: 20px;
+  position: relative;
+}
+.hack-body ul li::before {
+  content: '▶';
+  position: absolute;
+  left: 0;
+  font-size: 8px;
+  color: var(--lime);
+  top: 8px;
+}
+
+.hack-body .highlight { color: var(--lime); font-weight: 600; }
+.hack-body .warn { color: var(--amber); }
+.hack-body .critical { color: var(--red); font-weight: 600; }
+
+.hack-footer {
+  padding: 12px 20px;
+  background: rgba(0,0,0,0.3);
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--gray2);
+  border-top: 1px solid var(--border);
+}
+
+/* ─── FLASHCARD DECK ─── */
+.flashcard-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.fc-btn {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  padding: 8px 16px;
+  border-radius: 2px;
+  border: 1px solid;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: all 0.2s;
+}
+
+.fc-active { background: var(--lime); border-color: var(--lime); color: var(--black); }
+.fc-lime   { background: rgba(163,230,53,0.1); border-color: rgba(163,230,53,0.4); color: var(--lime); }
+.fc-amber  { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.4); color: var(--amber); }
+.fc-blue   { background: rgba(56,189,248,0.1); border-color: rgba(56,189,248,0.4); color: var(--blue); }
+.fc-lime:hover  { background: rgba(163,230,53,0.2); }
+.fc-amber:hover { background: rgba(251,191,36,0.2); }
+.fc-blue:hover  { background: rgba(56,189,248,0.2); }
+
+.flashcard-area {
+  perspective: 1200px;
+  margin-bottom: 20px;
+}
+
+.flashcard {
+  width: 100%;
+  min-height: 260px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+  cursor: pointer;
+}
+
+.flashcard.flipped { transform: rotateY(180deg); }
+
+.fc-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+}
+
+.fc-front {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--lime);
+  min-height: 260px;
+}
+
+.fc-back {
+  background: #0a1a0a;
+  border: 1px solid rgba(163,230,53,0.3);
+  border-top: 3px solid var(--lime2);
+  transform: rotateY(180deg);
+  min-height: 260px;
+}
+
+.fc-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fc-q-label { color: var(--gray2); }
+.fc-a-label { color: var(--lime2); }
+
+.fc-question {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: var(--white);
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+}
+
+.fc-answer {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  color: var(--white);
+  line-height: 1.7;
+}
+
+.fc-answer code {
+  background: rgba(163,230,53,0.15);
+  color: var(--lime);
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 13px;
+}
+
+.fc-hint {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  color: var(--gray2);
+  margin-top: 20px;
+  text-align: right;
+}
+
+.fc-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fc-nav-btn {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  padding: 10px 24px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fc-nav-btn:hover { border-color: var(--lime); color: var(--lime); }
+
+.fc-counter {
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--gray2);
+}
+
+.fc-counter span { color: var(--lime); }
+
+.fc-rating {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.fc-rate-btn {
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  padding: 7px 16px;
+  border-radius: 2px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fc-easy   { border-color: rgba(163,230,53,0.4); color: var(--lime);  background: rgba(163,230,53,0.08); }
+.fc-medium { border-color: rgba(251,191,36,0.4); color: var(--amber); background: rgba(251,191,36,0.08); }
+.fc-hard   { border-color: rgba(239,68,68,0.4);  color: var(--red);   background: rgba(239,68,68,0.08); }
+.fc-easy:hover   { background: rgba(163,230,53,0.2); }
+.fc-medium:hover { background: rgba(251,191,36,0.2); }
+.fc-hard:hover   { background: rgba(239,68,68,0.2); }
+
+/* ─── TROUBLESHOOTING FRAMEWORK ─── */
+.ts-framework {
+  position: relative;
+  padding-left: 40px;
+}
+
+.ts-framework::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--lime), var(--blue), var(--amber), var(--red));
+}
+
+.ts-step {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.ts-step::before {
+  content: '';
+  position: absolute;
+  left: -34px;
+  top: 24px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid;
+}
+
+.ts-step.s1::before { border-color: var(--lime);   background: rgba(163,230,53,0.3); }
+.ts-step.s2::before { border-color: var(--blue);   background: rgba(56,189,248,0.3); }
+.ts-step.s3::before { border-color: var(--amber);  background: rgba(251,191,36,0.3); }
+.ts-step.s4::before { border-color: var(--red);    background: rgba(239,68,68,0.3); }
+.ts-step.s5::before { border-color: var(--purple); background: rgba(167,139,250,0.3); }
+.ts-step.s6::before { border-color: var(--pink);   background: rgba(244,114,182,0.3); }
+
+.ts-step-num {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.ts-step.s1 .ts-step-num { color: var(--lime); }
+.ts-step.s2 .ts-step-num { color: var(--blue); }
+.ts-step.s3 .ts-step-num { color: var(--amber); }
+.ts-step.s4 .ts-step-num { color: var(--red); }
+.ts-step.s5 .ts-step-num { color: var(--purple); }
+.ts-step.s6 .ts-step-num { color: var(--pink); }
+
+.ts-step-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--white);
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
+
+.ts-step-body { font-size: 14px; color: var(--gray); line-height: 1.7; }
+.ts-step-body code { font-family: 'Fira Code', monospace; color: var(--lime); font-size: 12px; background: rgba(163,230,53,0.1); padding: 1px 5px; border-radius: 2px; }
+
+/* ─── MEMORY TECHNIQUES ─── */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.mem-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.mem-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.mem-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--white);
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
+
+.mem-body { font-size: 13px; color: var(--gray); line-height: 1.7; }
+.mem-body .ex { font-family: 'Fira Code', monospace; color: var(--lime); font-size: 12px; background: rgba(163,230,53,0.08); border: 1px solid rgba(163,230,53,0.2); padding: 8px 12px; border-radius: 2px; margin-top: 8px; display: block; line-height: 1.8; }
+
+/* ─── EXAM DAY CHECKLIST ─── */
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.cl-group {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cl-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cl-header.lime   { color: var(--lime); }
+.cl-header.amber  { color: var(--amber); }
+.cl-header.blue   { color: var(--blue); }
+.cl-header.red    { color: var(--red); }
+
+.cl-items { padding: 12px 18px; }
+
+.cl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+}
+
+.cl-item:last-child { border-bottom: none; }
+
+.cl-check {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--gray2);
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 10px;
+}
+
+.cl-item.checked .cl-check {
+  background: var(--lime);
+  border-color: var(--lime);
+  color: var(--black);
+}
+
+.cl-item.checked .cl-text { text-decoration: line-through; color: var(--gray2); }
+
+.cl-text { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+/* ─── WEEK TRACKER ─── */
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.week-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.week-card:hover { border-color: var(--lime); }
+.week-card.wk-done { border-color: rgba(163,230,53,0.4); background: rgba(163,230,53,0.04); }
+.week-card.wk-active { border-color: var(--amber); background: rgba(251,191,36,0.04); }
+
+.wk-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--gray2);
+}
+
+.wk-done .wk-num { color: var(--lime); }
+.wk-active .wk-num { color: var(--amber); }
+
+.wk-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--gray2);
+  margin-top: 4px;
+  letter-spacing: 0.06em;
+}
+
+.wk-topic { font-size: 12px; color: var(--gray); margin-top: 6px; line-height: 1.4; }
+
+/* ─── ALERT BOXES ─── */
+.alert {
+  padding: 14px 18px;
+  border-radius: 4px;
+  border-left: 3px solid;
+  font-size: 14px;
+  margin: 12px 0;
+  line-height: 1.6;
+}
+
+.alert-lime   { background: rgba(163,230,53,0.06); border-color: var(--lime);  color: var(--lime); }
+.alert-amber  { background: rgba(251,191,36,0.06);  border-color: var(--amber); color: var(--amber); }
+.alert-red    { background: rgba(239,68,68,0.06);   border-color: var(--red);   color: var(--red); }
+.alert-blue   { background: rgba(56,189,248,0.06);  border-color: var(--blue);  color: var(--blue); }
+
+/* ─── POMODORO TRACKER ─── */
+.pomodoro-display {
+  text-align: center;
+  padding: 40px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-width: 400px;
+  margin: 0 auto 32px;
+}
+
+.pomo-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 96px;
+  color: var(--lime);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 30px rgba(163,230,53,0.4);
+}
+
+.pomo-label {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: var(--gray);
+  letter-spacing: 0.15em;
+  margin-top: 8px;
+}
+
+.pomo-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.pomo-btn {
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  padding: 10px 20px;
+  border-radius: 2px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.06em;
+}
+
+.pomo-start { background: var(--lime); border-color: var(--lime); color: var(--black); font-weight: 700; }
+.pomo-start:hover { background: var(--lime2); }
+.pomo-reset { background: transparent; border-color: var(--gray2); color: var(--gray); }
+.pomo-reset:hover { border-color: var(--red); color: var(--red); }
+
+.pomo-sets {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.pomo-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--gray2);
+  transition: background 0.3s;
+}
+
+.pomo-dot.done { background: var(--lime); box-shadow: 0 0 6px var(--lime); }
+.pomo-dot.active { background: var(--amber); box-shadow: 0 0 6px var(--amber); animation: pomoPulse 1s infinite; }
+
+@keyframes pomoPulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── MOBILE ─── */
+@media (max-width: 768px) {
+  .hero { padding: 100px 24px 60px; }
+  section { padding: 64px 24px; }
+  #topnav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero-corner { display: none; }
+  .hero-stats { gap: 24px; }
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up { animation: fadeUp 0.6s ease both; }
+.fade-up-1 { animation-delay: 0.1s; }
+.fade-up-2 { animation-delay: 0.2s; }
+.fade-up-3 { animation-delay: 0.3s; }
+
+/* ─── DIVIDER ─── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0;
+  font-family: 'Fira Code', monospace;
+  font-size: 10px;
+  color: var(--gray2);
+  letter-spacing: 0.15em;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav id="topnav">
+  <div class="nav-brand">CCNA BATTLE PLAN</div>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#schedule">Daily Schedule</a></li>
+    <li><a href="#phases">Phase Plan</a></li>
+    <li><a href="#hacks">Study Hacks</a></li>
+    <li><a href="#flashcards">Flashcards</a></li>
+    <li><a href="#troubleshoot">Troubleshooting</a></li>
+    <li><a href="#memory">Memory</a></li>
+    <li><a href="#examday">Exam Day</a></li>
+  </ul>
+</nav>
+<div id="reading-bar" style="width:0%"></div>
+
+<!-- ═══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<div class="hero" id="top">
+  <div class="hero-grid"></div>
+  <div class="hero-corner">
+    <div>TARGET EXAM <span>CCNA 200-301</span></div>
+    <div>STUDY WINDOW <span>70 DAYS</span></div>
+    <div>DAILY COMMITMENT <span>4 HRS</span></div>
+    <div>PASS RATE (PREPARED) <span>~85%</span></div>
+  </div>
+
+  <div class="hero-tag fade-up">CCNA 200-301 / STUDY SYSTEM / 2-MONTH SPRINT</div>
+  <h1 class="fade-up fade-up-1">
+    <span class="accent">70-DAY</span><br>BATTLE<br>PLAN
+  </h1>
+  <p class="hero-sub fade-up fade-up-2">
+    A ruthlessly engineered study system for passing CCNA in 70 days on 4 hours/day.
+    Built around spaced repetition, active recall, deliberate practice, and deep troubleshooting — not passive reading.
+  </p>
+
+  <div class="hero-stats fade-up fade-up-3">
+    <div class="stat-item">
+      <div class="stat-num">70</div>
+      <div class="stat-label">Total Days</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">280</div>
+      <div class="stat-label">Total Hours</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3+1</div>
+      <div class="stat-label">Study + Review</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Study Phases</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 1 — OVERVIEW
+═══════════════════════════════════════ -->
+<section id="overview">
+  <div class="section-tag">01 / OVERVIEW</div>
+  <h2 class="section-title">The <span class="accent">Numbers</span></h2>
+
+  <div class="overview-grid">
+    <div class="ov-card lime">
+      <div class="ov-num">70</div>
+      <div class="ov-label">Total Days</div>
+      <div class="ov-desc">2 months + 10 days from today to exam booking</div>
+    </div>
+    <div class="ov-card amber">
+      <div class="ov-num">3hrs</div>
+      <div class="ov-label">New Learning</div>
+      <div class="ov-desc">Deep study: new concepts, labs, Packet Tracer, active reading</div>
+    </div>
+    <div class="ov-card blue">
+      <div class="ov-num">1hr</div>
+      <div class="ov-label">Review Block</div>
+      <div class="ov-desc">Spaced repetition, flashcards, past-topic quiz drills — daily non-negotiable</div>
+    </div>
+    <div class="ov-card red">
+      <div class="ov-num">280</div>
+      <div class="ov-label">Total Hours</div>
+      <div class="ov-desc">More than enough for CCNA if every hour is active, not passive</div>
+    </div>
+    <div class="ov-card purple">
+      <div class="ov-num">4</div>
+      <div class="ov-label">Study Phases</div>
+      <div class="ov-desc">Foundations → Deep Dive → Labs Only → Exam Simulation</div>
+    </div>
+    <div class="ov-card pink">
+      <div class="ov-num">820</div>
+      <div class="ov-label">Passing Score</div>
+      <div class="ov-desc">Out of 1000. Aim for 880+ in practice — leaves a safety buffer</div>
+    </div>
+  </div>
+
+  <div class="alert alert-amber">
+    ⚠️ <strong>The #1 mistake:</strong> Treating study time as reading time. Reading is passive. Your 4 hours must be 80% active — typing commands, drawing diagrams from memory, answering questions, and explaining concepts out loud.
+  </div>
+
+  <div class="alert alert-lime">
+    ✅ <strong>The success formula:</strong> Learn → Apply in Packet Tracer → Quiz yourself → Review with flashcards → Sleep → Repeat. The brain consolidates during sleep. Never pull all-nighters.
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 2 — DAILY FIXED SCHEDULE
+═══════════════════════════════════════ -->
+<section id="schedule">
+  <div class="section-tag">02 / DAILY SCHEDULE</div>
+  <h2 class="section-title">Fixed <span class="accent">Time Blocks</span></h2>
+
+  <div class="alert alert-blue" style="margin-bottom:32px">
+    🕐 <strong>Fix your study time DAILY — same time, same place.</strong> The brain primes itself for deep work when it knows when work is coming. Treat these as non-negotiable appointments with your future self.
+  </div>
+
+  <!-- PRIMARY SCHEDULE -->
+  <div class="schedule-block">
+    <div class="schedule-header">
+      <div class="sched-title">PRIMARY STUDY BLOCK</div>
+      <div class="sched-time">⏱ 3 HOURS — DAILY</div>
+    </div>
+    <div class="schedule-body">
+      <div class="time-row">
+        <div class="time-badge tb-lime">BLOCK 1 — 45 MIN</div>
+        <div class="time-content">
+          <strong>Active Reading / New Concept</strong>
+          <br>Read ONE topic section. No highlighting without thinking. After every paragraph, close the material and write what you remember. Use the CCNA guide — read with a question: "What does this connect to?"
+          <div class="note">// Recommended: 1.1 → 1.2 → ... one sub-topic per session</div>
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-blue">BREAK — 10 MIN</div>
+        <div class="time-content">
+          <strong>Physical break — stand up, walk, water</strong>
+          <div class="note">// No phone. No social media. Let your brain pre-process.</div>
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-amber">BLOCK 2 — 50 MIN</div>
+        <div class="time-content">
+          <strong>Packet Tracer Lab / CLI Hands-On</strong>
+          <br>Build the lab for today's topic. Type every command — never copy-paste. If it fails, troubleshoot before looking at the answer. The failure moment is where learning happens.
+          <div class="note">// Use the 5 labs from your CCNA guide — match lab to topic</div>
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-blue">BREAK — 10 MIN</div>
+        <div class="time-content">
+          <strong>Physical break</strong>
+          <div class="note">// Drink water. Do 10 pushups. Reset focus.</div>
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-purple">BLOCK 3 — 45 MIN</div>
+        <div class="time-content">
+          <strong>Quiz Yourself / Practice Questions</strong>
+          <br>Do the quiz from your study guide for today's section. Then write 3 exam-style questions about today's topic yourself. Explaining forces deeper understanding than reading.
+          <div class="note">// Target: Boson NetSim, Cisco Practice Exam, or section quizzes</div>
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-lime">BLOCK 4 — 20 MIN</div>
+        <div class="time-content">
+          <strong>Brain Dump / Teach-Back</strong>
+          <br>Close everything. Open a blank page. Write everything you know about today's topic in 20 minutes without looking. Draw the topology. Write the commands. Anything you can't write — you don't know yet.
+          <div class="note">// This is the most powerful technique in the system. Never skip it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEW BLOCK -->
+  <div class="schedule-block">
+    <div class="schedule-header">
+      <div class="sched-title">REVIEW BLOCK — SPACED REPETITION</div>
+      <div class="sched-time">⏱ 1 HOUR — DAILY (NEVER SKIP)</div>
+    </div>
+    <div class="schedule-body">
+      <div class="time-row">
+        <div class="time-badge tb-amber">0:00 – 0:20</div>
+        <div class="time-content">
+          <strong>Flashcard Drill</strong>
+          <br>Go through 20–30 flashcards (see flashcard section below). Mark each as Easy / Medium / Hard. Hard cards come back tomorrow. Easy cards come back in 4 days. This is spaced repetition — the #1 memory technique backed by science.
+          <div class="note">// Use Anki app OR the interactive flashcards in this guide</div>
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-red">0:20 – 0:40</div>
+        <div class="time-content">
+          <strong>Previous Topic Re-Test</strong>
+          <br>Grab yesterday's topic. WITHOUT NOTES — write: the key commands, the OSI layer, the exam gotchas, the troubleshooting steps. Compare to your notes. Every gap is a target.
+          <div class="note">// Go back 2–3 topics, not just yesterday</div>
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-lime">0:40 – 1:00</div>
+        <div class="time-content">
+          <strong>Mind Map Expansion</strong>
+          <br>Maintain one master CCNA mind map (paper or digital). Every day, add today's topic and connect it to existing topics. "STP connects to Switching, which connects to MAC table, which connects to VLANs." The connections build the network of knowledge.
+          <div class="note">// Recommended tool: XMind (free) or pen + large paper</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY REVIEW -->
+  <div class="schedule-block" style="margin-top:24px">
+    <div class="schedule-header">
+      <div class="sched-title">WEEKLY REVIEW — EVERY SUNDAY</div>
+      <div class="sched-time">⏱ 2 HOURS EXTRA</div>
+    </div>
+    <div class="schedule-body">
+      <div class="time-row">
+        <div class="time-badge tb-amber">SUNDAY 1HR</div>
+        <div class="time-content">
+          <strong>Full Week Brain Dump</strong> — Write every topic covered that week, all key commands, all exam traps, all port numbers. Without notes. Score yourself. Gaps = priorities for next week.
+        </div>
+      </div>
+      <div class="time-row">
+        <div class="time-badge tb-blue">SUNDAY 1HR</div>
+        <div class="time-content">
+          <strong>One Full Mock Exam Section</strong> — Pick one CCNA exam domain and do 20–30 exam-style questions timed (90 seconds/question avg). Review every wrong answer in detail.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 3 — 4-PHASE PLAN
+═══════════════════════════════════════ -->
+<section id="phases">
+  <div class="section-tag">03 / PHASE PLAN</div>
+  <h2 class="section-title">The <span class="accent">4 Phases</span></h2>
+
+  <div class="alert alert-lime" style="margin-bottom:32px">
+    📅 Each phase has a clear focus. When Phase 1 ends, stop reading about Phase 1 topics — trust the review system to maintain them while you push forward.
+  </div>
+
+  <div class="week-grid" style="margin-bottom:40px">
+    <div class="week-card wk-done"><div class="wk-num">WK 1</div><div class="wk-label">Phase 1</div><div class="wk-topic">Network Fundamentals 1.0 (All 13 topics)</div></div>
+    <div class="week-card wk-done"><div class="wk-num">WK 2</div><div class="wk-label">Phase 1</div><div class="wk-topic">Network Access 2.0 — VLANs, STP, EtherChannel</div></div>
+    <div class="week-card wk-active"><div class="wk-num">WK 3</div><div class="wk-label">Phase 1</div><div class="wk-topic">IP Connectivity 3.0 — Routing, OSPF, Static Routes</div></div>
+    <div class="week-card"><div class="wk-num">WK 4</div><div class="wk-label">Phase 1</div><div class="wk-topic">IP Services 4.0 — NAT, NTP, DHCP, DNS, FHRP</div></div>
+    <div class="week-card"><div class="wk-num">WK 5</div><div class="wk-label">Phase 1</div><div class="wk-topic">Security Fundamentals 5.0 + Automation 6.0</div></div>
+    <div class="week-card"><div class="wk-num">WK 6</div><div class="wk-label">Phase 2</div><div class="wk-topic">Deep Dive — weak areas from Phase 1 brain dumps</div></div>
+    <div class="week-card"><div class="wk-num">WK 7</div><div class="wk-label">Phase 2</div><div class="wk-topic">Deep Dive — Subnetting, OSPF, VLANs (most tested)</div></div>
+    <div class="week-card"><div class="wk-num">WK 8</div><div class="wk-label">Phase 3</div><div class="wk-topic">Labs ONLY — Packet Tracer all day, zero new reading</div></div>
+    <div class="week-card"><div class="wk-num">WK 9</div><div class="wk-label">Phase 3</div><div class="wk-topic">Mock Exams — Boson, Pearson, timed full simulations</div></div>
+    <div class="week-card"><div class="wk-num">WK 10</div><div class="wk-label">Phase 4</div><div class="wk-topic">Final Exam Prep — revision only, nothing new</div></div>
+  </div>
+
+  <div style="overflow-x:auto">
+    <table class="phase-table">
+      <thead>
+        <tr>
+          <th>PHASE</th>
+          <th>DAYS</th>
+          <th>FOCUS</th>
+          <th>DAILY TARGET</th>
+          <th>SUCCESS METRIC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="phase-num ph-1">01</div><div style="font-family:'Fira Code',monospace;font-size:10px;color:var(--lime)">FOUNDATIONS</div></td>
+          <td style="color:var(--white)">Days 1–35<br><span style="color:var(--gray2);font-size:12px">5 Weeks</span></td>
+          <td>Cover all 6 exam domains once, sequentially. Build the knowledge framework. Every topic = read + lab + quiz + brain dump.</td>
+          <td>
+            <span class="tag-pill tp-lime">1 new topic/day</span><br>
+            <span class="tag-pill tp-amber">1 PT lab/day</span><br>
+            <span class="tag-pill tp-blue">20 flashcards/day</span>
+          </td>
+          <td style="color:var(--white)">Can explain every topic to a beginner. Brain dump score &gt;60%</td>
+        </tr>
+        <tr>
+          <td><div class="phase-num ph-2">02</div><div style="font-family:'Fira Code',monospace;font-size:10px;color:var(--amber)">DEEP DIVE</div></td>
+          <td style="color:var(--white)">Days 36–49<br><span style="color:var(--gray2);font-size:12px">2 Weeks</span></td>
+          <td>Target your 5 weakest topics (from brain dump scores). Re-read, re-lab, re-quiz. No new content — only reinforcement.</td>
+          <td>
+            <span class="tag-pill tp-amber">2× weak topic review</span><br>
+            <span class="tag-pill tp-red">Timed quizzes daily</span><br>
+            <span class="tag-pill tp-lime">40 flashcards/day</span>
+          </td>
+          <td style="color:var(--white)">Practice score &gt;75% on weak topics. Brain dump &gt;80%</td>
+        </tr>
+        <tr>
+          <td><div class="phase-num ph-3">03</div><div style="font-family:'Fira Code',monospace;font-size:10px;color:var(--blue)">LAB ASSAULT</div></td>
+          <td style="color:var(--white)">Days 50–63<br><span style="color:var(--gray2);font-size:12px">2 Weeks</span></td>
+          <td>Packet Tracer and mock exams only. Build complex multi-topic scenarios. Simulate the exam under timed pressure daily. Troubleshoot broken configs.</td>
+          <td>
+            <span class="tag-pill tp-blue">1 full mock exam/day</span><br>
+            <span class="tag-pill tp-lime">1 complex PT lab/day</span><br>
+            <span class="tag-pill tp-amber">Review every wrong Q</span>
+          </td>
+          <td style="color:var(--white)">Consistently scoring 80%+ on full mock exams (Boson)</td>
+        </tr>
+        <tr>
+          <td><div class="phase-num ph-4">04</div><div style="font-family:'Fira Code',monospace;font-size:10px;color:var(--red)">FINAL LOCK-IN</div></td>
+          <td style="color:var(--white)">Days 64–70<br><span style="color:var(--gray2);font-size:12px">1 Week</span></td>
+          <td>ZERO new content. Flashcards, summary sheets, command cheat sheets only. Day 69: light review + early sleep. Day 70: exam day.</td>
+          <td>
+            <span class="tag-pill tp-red">No new topics</span><br>
+            <span class="tag-pill tp-lime">Cheat sheet review</span><br>
+            <span class="tag-pill tp-amber">Sleep 8hrs minimum</span>
+          </td>
+          <td style="color:var(--white)">Mental readiness. All cheat sheets memorised. Confidence at 9/10.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 4 — STUDY HACKS
+═══════════════════════════════════════ -->
+<section id="hacks">
+  <div class="section-tag">04 / STUDY HACKS</div>
+  <h2 class="section-title">12 Ruthless <span class="accent">Study Hacks</span></h2>
+
+  <div class="hacks-grid">
+
+    <!-- HACK 1 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">01</div>
+        <div class="hack-meta">
+          <div class="hack-title">THE FEYNMAN DRILL — Explain or You Don't Know It</div>
+          <div class="hack-cat" style="color:var(--lime)">🧠 Understanding</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        After every study session, close your notes and explain the topic as if teaching a 10-year-old. If you use jargon or stumble, those are your gaps. Return to that exact gap — not the full topic.
+        <ul style="margin-top:10px">
+          <li>Explain OSPF neighbor states in plain English</li>
+          <li>Draw the STP election process from memory</li>
+          <li>Describe what a switch does when it sees an unknown MAC</li>
+          <li>Explain EUI-64 to someone who has never heard of IPv6</li>
+        </ul>
+        <div class="alert alert-lime" style="margin-top:10px;font-size:13px">If you can't explain it simply, you don't understand it — you've only memorised it.</div>
+      </div>
+      <div class="hack-footer">⏱ When: End of every 3-hour block | Duration: 20 mins</div>
+    </div>
+
+    <!-- HACK 2 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">02</div>
+        <div class="hack-meta">
+          <div class="hack-title">SPACED REPETITION — The Forgetting Curve Killer</div>
+          <div class="hack-cat" style="color:var(--amber)">📅 Memory</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        The brain forgets 70% of new information within 24 hours unless you review it. Spaced repetition schedules reviews at the exact moment before you forget.
+        <ul style="margin-top:10px">
+          <li><span class="highlight">Day 1:</span> Learn the topic</li>
+          <li><span class="highlight">Day 2:</span> Review (flashcard drill)</li>
+          <li><span class="highlight">Day 4:</span> Review (brain dump)</li>
+          <li><span class="highlight">Day 8:</span> Review (teach-back)</li>
+          <li><span class="highlight">Day 16:</span> Quick quiz — then topic is locked</li>
+        </ul>
+        <div class="alert alert-amber" style="margin-top:10px;font-size:13px">Use <strong>Anki</strong> app (free) — it automates the entire schedule. Import CCNA decks from AnkiWeb.</div>
+      </div>
+      <div class="hack-footer">⏱ When: Review block daily | Duration: 20 mins flashcards</div>
+    </div>
+
+    <!-- HACK 3 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">03</div>
+        <div class="hack-meta">
+          <div class="hack-title">ACTIVE RECALL — Never Re-Read, Always Re-Test</div>
+          <div class="hack-cat" style="color:var(--blue)">🔄 Retention</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        Re-reading is the most inefficient study method. Your brain needs to struggle to retrieve information — that struggle is what makes memories permanent.
+        <ul style="margin-top:10px">
+          <li>After reading a page, cover it and write what you remember</li>
+          <li>Do practice questions before you feel "ready"</li>
+          <li>Use the quiz questions in your CCNA guide immediately</li>
+          <li>Failed recall attempt = still learning faster than re-reading</li>
+        </ul>
+        <div class="alert alert-blue" style="margin-top:10px;font-size:13px">The discomfort of struggling to remember something IS the learning. Embrace it.</div>
+      </div>
+      <div class="hack-footer">⏱ When: After every topic block | Duration: Ongoing</div>
+    </div>
+
+    <!-- HACK 4 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">04</div>
+        <div class="hack-meta">
+          <div class="hack-title">DELIBERATE FAILURE — Break Things on Purpose</div>
+          <div class="hack-cat" style="color:var(--red)">🔧 Troubleshooting</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        In Packet Tracer, after completing a working lab — intentionally break it. Introduce duplex mismatches, wrong subnet masks, missing <code>no shutdown</code>, wrong encapsulation. Then diagnose and fix it using only show commands.
+        <ul style="margin-top:10px">
+          <li>Remove a VLAN from a trunk — watch traffic stop</li>
+          <li>Misconfigure OSPF area number — watch adjacency drop</li>
+          <li>Set wrong default gateway — watch pings fail</li>
+          <li>Use <code>show ip interface brief</code> to see what broke</li>
+        </ul>
+        <div class="alert alert-red" style="margin-top:10px;font-size:13px">CCNA exam has troubleshooting scenarios. This hack builds exactly that muscle.</div>
+      </div>
+      <div class="hack-footer">⏱ When: Last 15 mins of every PT lab session</div>
+    </div>
+
+    <!-- HACK 5 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">05</div>
+        <div class="hack-meta">
+          <div class="hack-title">THE BRAIN DUMP JOURNAL — Your Personal Exam</div>
+          <div class="hack-cat" style="color:var(--lime)">📓 Retention</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        Keep a dedicated notebook. At the end of each session, open to a blank page and write everything from memory for exactly 15 minutes. No timer extensions.
+        <ul style="margin-top:10px">
+          <li>Draw the topology you just built from memory</li>
+          <li>Write all commands in order, including syntax</li>
+          <li>List the exam traps for today's topic</li>
+          <li>Write the comparison table (e.g., TCP vs UDP)</li>
+        </ul>
+        After 70 days this notebook becomes your ultimate revision tool — written in your own words, targeting your own gaps.
+      </div>
+      <div class="hack-footer">⏱ When: Last 15–20 mins of 3hr study block | Every day</div>
+    </div>
+
+    <!-- HACK 6 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">06</div>
+        <div class="hack-meta">
+          <div class="hack-title">COMMAND MUSCLE MEMORY — Type Until It's Automatic</div>
+          <div class="hack-cat" style="color:var(--amber)">⌨️ CLI Mastery</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        The exam has simlet questions (drag-and-drop CLI, fill-in-the-blank commands). Your fingers need to know the commands without your brain consciously thinking.
+        <ul style="margin-top:10px">
+          <li>Type every command — never copy-paste in Packet Tracer</li>
+          <li>Practice the 20 most common commands daily in Week 3+</li>
+          <li>Recite the full configuration sequence for OSPF, VLANs, and subinterfaces from memory</li>
+          <li>Know exactly what each <code>show</code> command reveals</li>
+        </ul>
+        <div class="alert alert-amber" style="margin-top:10px;font-size:13px">Target commands: <code>show ip int br</code> · <code>show run</code> · <code>show ip route</code> · <code>show mac addr</code> · <code>show vlan br</code> · <code>debug ip ospf adj</code></div>
+      </div>
+      <div class="hack-footer">⏱ When: Every PT lab session — type everything</div>
+    </div>
+
+    <!-- HACK 7 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">07</div>
+        <div class="hack-meta">
+          <div class="hack-title">EXAM TRAP HUNTING — Study What Cisco Tricks You With</div>
+          <div class="hack-cat" style="color:var(--purple)">🎯 Exam Strategy</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        Cisco writes exam questions specifically designed to catch common misunderstandings. Build a personal "Trap List" and review it weekly.
+        <ul style="margin-top:10px">
+          <li class="warn">Switches break collision domains, NOT broadcast domains</li>
+          <li class="warn">L3 switch needs <code>ip routing</code> — disabled by default</li>
+          <li class="warn">:: can only appear ONCE in IPv6</li>
+          <li class="warn">172.16–172.31 are all private (not just 172.16)</li>
+          <li class="warn">IDS detects; IPS prevents — NGFW does both</li>
+          <li class="warn">Late collisions = duplex mismatch, NOT cable too long</li>
+          <li class="warn">DNS uses BOTH TCP and UDP port 53</li>
+          <li class="warn">PoE+ 802.3at = 30W (not 15.4W which is 802.3af)</li>
+        </ul>
+      </div>
+      <div class="hack-footer">⏱ When: Weekly Sunday review | Keep a running list</div>
+    </div>
+
+    <!-- HACK 8 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">08</div>
+        <div class="hack-meta">
+          <div class="hack-title">THE ANALOGY BANK — Real World Locks It In</div>
+          <div class="hack-cat" style="color:var(--pink)">🌍 Understanding</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        Abstract concepts stick when anchored to real-world analogies. Build your own analogy bank — one per topic.
+        <ul style="margin-top:10px">
+          <li><span class="highlight">Router</span> = Post office — reads full address, routes to correct city</li>
+          <li><span class="highlight">Switch</span> = Building receptionist — knows which floor each person sits on</li>
+          <li><span class="highlight">VLAN</span> = Floors in a building — same building, isolated communities</li>
+          <li><span class="highlight">OSPF</span> = GPS that recalculates when roads close</li>
+          <li><span class="highlight">NAT</span> = Company PO Box — one address, many employees</li>
+          <li><span class="highlight">STP</span> = Traffic lights preventing roundabout deadlocks</li>
+          <li><span class="highlight">ACL</span> = Airport security checkpoint</li>
+        </ul>
+      </div>
+      <div class="hack-footer">⏱ When: Write one analogy per new topic learned</div>
+    </div>
+
+    <!-- HACK 9 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">09</div>
+        <div class="hack-meta">
+          <div class="hack-title">POMODORO FOR CCNA — 25/5 Focused Sprints</div>
+          <div class="hack-cat" style="color:var(--lime)">⏱ Focus</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        Your 3-hour block = 4 Pomodoros of 45 minutes with 10-minute breaks. Your 1-hour review = 2 Pomodoros of 25 minutes with 5-minute breaks. Use the timer below.
+        <ul style="margin-top:10px">
+          <li>During each Pomodoro — phone face down, notifications off</li>
+          <li>If interrupted, restart the timer (not negotiable)</li>
+          <li>After 4 Pomodoros — take a 20-minute long break</li>
+          <li>The constraint creates urgency and focus simultaneously</li>
+        </ul>
+        <div class="alert alert-lime" style="margin-top:10px;font-size:13px">The best CCNA students study less hours with better focus — not more hours with distraction.</div>
+      </div>
+      <div class="hack-footer">⏱ Use the timer in Section 5 of this guide</div>
+    </div>
+
+    <!-- HACK 10 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">10</div>
+        <div class="hack-meta">
+          <div class="hack-title">THE SUBNETTING SPRINT — 2 Minutes Per Subnet</div>
+          <div class="hack-cat" style="color:var(--red)">🔢 Subnetting</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        Subnetting is tested heavily and under time pressure. You need to calculate network address, broadcast, host range, and usable hosts in under 2 minutes without a calculator.
+        <ul style="margin-top:10px">
+          <li>Memorise the entire subnet mask table (/24 to /30) cold</li>
+          <li>Practise 10 subnetting problems daily in Weeks 1–3</li>
+          <li>Use the <span class="highlight">Magic Number method</span>: 256 minus last mask octet = block size</li>
+          <li>Time yourself — aim for 90 seconds per calculation</li>
+          <li>Know VLSM allocation order: largest subnet first always</li>
+        </ul>
+      </div>
+      <div class="hack-footer">⏱ When: 10 mins every day in review block</div>
+    </div>
+
+    <!-- HACK 11 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">11</div>
+        <div class="hack-meta">
+          <div class="hack-title">SLEEP AS A TOOL — Consolidate During Rest</div>
+          <div class="hack-cat" style="color:var(--blue)">😴 Biology</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        Sleep is not wasted study time — it IS study time. During deep sleep, your hippocampus transfers short-term learning into long-term memory. Sacrificing sleep for study hours is counterproductive.
+        <ul style="margin-top:10px">
+          <li><span class="highlight">Sleep 7–8 hours minimum</span> — non-negotiable</li>
+          <li>Review flashcards 30 mins before bed (last input before sleep consolidates)</li>
+          <li>No screens 20 mins before sleep — blue light disrupts consolidation</li>
+          <li>Morning: spend 5 mins recalling what you studied yesterday before opening notes</li>
+        </ul>
+      </div>
+      <div class="hack-footer">⏱ Daily: 7–8hrs sleep + 5min morning recall</div>
+    </div>
+
+    <!-- HACK 12 -->
+    <div class="hack-card">
+      <div class="hack-header">
+        <div class="hack-num">12</div>
+        <div class="hack-meta">
+          <div class="hack-title">MOCK EXAM PROTOCOL — Simulate Real Conditions</div>
+          <div class="hack-cat" style="color:var(--amber)">📋 Exam Prep</div>
+        </div>
+      </div>
+      <div class="hack-body">
+        From Week 7 onwards, simulate exam conditions exactly. The exam is 120 minutes, 100–120 questions. You must desensitise to exam pressure before exam day.
+        <ul style="margin-top:10px">
+          <li>Boson ExSim-Max for CCNA — best mock exam on the market</li>
+          <li>Sit in same chair, same time, same environment each mock</li>
+          <li>Phone off, no notes, no hints — exactly like exam day</li>
+          <li>After each mock: review every wrong answer, understand WHY</li>
+          <li class="critical">Target: 80%+ consistently before booking the real exam</li>
+        </ul>
+      </div>
+      <div class="hack-footer">⏱ When: Phase 3 — daily full mock | Phase 4 — half mocks</div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 5 — POMODORO TIMER
+═══════════════════════════════════════ -->
+<section id="timer">
+  <div class="section-tag">05 / FOCUS TIMER</div>
+  <h2 class="section-title">Pomodoro <span class="accent">Study Timer</span></h2>
+
+  <div class="pomodoro-display">
+    <div class="pomo-time" id="pomo-display">45:00</div>
+    <div class="pomo-label" id="pomo-label">STUDY BLOCK — READY TO START</div>
+    <div class="pomo-sets">
+      <div class="pomo-dot" id="pd0"></div>
+      <div class="pomo-dot" id="pd1"></div>
+      <div class="pomo-dot" id="pd2"></div>
+      <div class="pomo-dot" id="pd3"></div>
+    </div>
+    <div class="pomo-controls">
+      <button class="pomo-btn pomo-start" id="pomo-start-btn" onclick="pomoStart()">▶ START</button>
+      <button class="pomo-btn pomo-reset" onclick="pomoReset()">↺ RESET</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;max-width:600px;margin:0 auto">
+    <button class="fc-btn fc-lime" onclick="setPomoTime(45,'DEEP STUDY — 45 MIN')">45 min Study Block</button>
+    <button class="fc-btn fc-amber" onclick="setPomoTime(25,'REVIEW BLOCK — 25 MIN')">25 min Review</button>
+    <button class="fc-btn fc-blue" onclick="setPomoTime(10,'BREAK — 10 MIN')">10 min Break</button>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 6 — FLASHCARDS
+═══════════════════════════════════════ -->
+<section id="flashcards">
+  <div class="section-tag">06 / FLASHCARDS</div>
+  <h2 class="section-title">Active Recall <span class="accent">Flashcards</span></h2>
+
+  <div class="alert alert-lime" style="margin-bottom:24px">
+    👆 Click any card to flip it. Rate each card after seeing the answer. Hard cards will come back sooner. The goal is to make every card EASY.
+  </div>
+
+  <div class="flashcard-controls">
+    <button class="fc-btn fc-active" onclick="filterCards('all', this)">ALL CARDS</button>
+    <button class="fc-btn fc-lime" onclick="filterCards('fundamentals', this)">Fundamentals</button>
+    <button class="fc-btn fc-amber" onclick="filterCards('switching', this)">Switching</button>
+    <button class="fc-btn fc-blue" onclick="filterCards('routing', this)">Routing</button>
+    <button class="fc-btn fc-lime" onclick="filterCards('ipv6', this)">IPv6</button>
+    <button class="fc-btn fc-amber" onclick="filterCards('security', this)">Security</button>
+    <button class="fc-btn fc-blue" onclick="filterCards('wireless', this)">Wireless</button>
+  </div>
+
+  <div class="flashcard-area">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="fc-face fc-front">
+        <div class="fc-label fc-q-label">▶ QUESTION — click to reveal answer</div>
+        <div class="fc-question" id="fc-question">Loading...</div>
+        <div class="fc-hint">tap / click to flip →</div>
+      </div>
+      <div class="fc-face fc-back">
+        <div class="fc-label fc-a-label">✓ ANSWER</div>
+        <div class="fc-answer" id="fc-answer">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fc-rating" id="fc-rating" style="display:none">
+    <button class="fc-rate-btn fc-hard"   onclick="rateCard('hard')">✗ Hard — see again tomorrow</button>
+    <button class="fc-rate-btn fc-medium" onclick="rateCard('medium')">~ Medium — see in 2 days</button>
+    <button class="fc-rate-btn fc-easy"   onclick="rateCard('easy')">✓ Easy — see in 4 days</button>
+  </div>
+
+  <div class="fc-nav" style="margin-top:20px">
+    <button class="fc-nav-btn" onclick="prevCard()">← PREVIOUS</button>
+    <div class="fc-counter">Card <span id="fc-current">1</span> of <span id="fc-total">1</span> &nbsp;|&nbsp; <span id="fc-cat-label" style="color:var(--lime)">ALL</span></div>
+    <button class="fc-nav-btn" onclick="nextCard()">NEXT →</button>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 7 — TROUBLESHOOTING FRAMEWORK
+═══════════════════════════════════════ -->
+<section id="troubleshoot">
+  <div class="section-tag">07 / TROUBLESHOOTING</div>
+  <h2 class="section-title">The CCNA <span class="accent">Troubleshooting Framework</span></h2>
+
+  <div class="alert alert-blue" style="margin-bottom:32px">
+    🔧 Troubleshooting is a skill, not knowledge — it must be practised, not memorised. This 6-step OSI-based framework solves 95% of CCNA scenario questions.
+  </div>
+
+  <div class="ts-framework">
+
+    <div class="ts-step s1">
+      <div class="ts-step-num">STEP 01 — START BOTTOM-UP</div>
+      <div class="ts-step-title">Verify Physical Layer (Layer 1)</div>
+      <div class="ts-step-body">
+        Before anything else — is the cable plugged in? Is the interface up?
+        <br><br>
+        <strong style="color:var(--white)">Commands:</strong><br>
+        <code>show interfaces</code> — look for "up/up" status. If "down/down" = cable problem. If "up/down" = keepalive problem or Layer 2 mismatch.<br>
+        <code>show ip interface brief</code> — fastest overview of all interface states.<br><br>
+        <strong style="color:var(--white)">Key checks:</strong> CRC errors → bad cable. Late collisions → duplex mismatch. Input errors → EMI or damaged cable.
+      </div>
+    </div>
+
+    <div class="ts-step s2">
+      <div class="ts-step-num">STEP 02 — DATA LINK</div>
+      <div class="ts-step-title">Verify Layer 2 — MAC, VLAN, Encapsulation</div>
+      <div class="ts-step-body">
+        Is the switch learning MAC addresses? Are VLANs configured correctly? Is the trunk carrying the right VLANs?<br><br>
+        <code>show mac address-table</code> — is the destination MAC learned?<br>
+        <code>show vlan brief</code> — is the VLAN active and assigned to the right ports?<br>
+        <code>show interfaces trunk</code> — is the trunk up? Are VLANs allowed?<br>
+        <code>show interfaces [x] switchport</code> — access or trunk? Correct VLAN?<br><br>
+        <strong style="color:var(--white)">Router-on-a-stick check:</strong> <code>show interfaces [x.vlan]</code> — is <code>encapsulation dot1Q [vlan]</code> set correctly?
+      </div>
+    </div>
+
+    <div class="ts-step s3">
+      <div class="ts-step-num">STEP 03 — NETWORK</div>
+      <div class="ts-step-title">Verify Layer 3 — IP Address, Subnet, Route</div>
+      <div class="ts-step-body">
+        Is the IP address correct? Are devices in the same subnet? Does a route exist to the destination?<br><br>
+        <code>show ip interface brief</code> — IP assigned and interface up?<br>
+        <code>show ip route</code> — route to destination exists? Correct next hop?<br>
+        <code>ping [ip]</code> — can you reach the gateway? The remote host?<br>
+        <code>traceroute [ip]</code> — where exactly does it stop?<br><br>
+        <strong style="color:var(--white)">L3 Switch gotcha:</strong> Did you enable <code>ip routing</code>? Without it, SVIs don't route.
+      </div>
+    </div>
+
+    <div class="ts-step s4">
+      <div class="ts-step-num">STEP 04 — TRANSPORT & APPLICATION</div>
+      <div class="ts-step-title">Verify Ports, ACLs, and Services</div>
+      <div class="ts-step-body">
+        Can you ping but can't access the service? Check ACLs, firewall rules, and service configurations.<br><br>
+        <code>show ip access-lists</code> — any ACL blocking traffic? Check match counts.<br>
+        <code>show running-config | section ip access</code> — where is the ACL applied?<br>
+        <code>show ip nat translations</code> — is NAT translating correctly?<br><br>
+        <strong style="color:var(--white)">ACL debug tip:</strong> Add <code>permit ip any any log</code> at the end temporarily to see what's being denied.
+      </div>
+    </div>
+
+    <div class="ts-step s5">
+      <div class="ts-step-num">STEP 05 — ROUTING PROTOCOLS</div>
+      <div class="ts-step-title">Verify OSPF / EIGRP / Routing Protocol State</div>
+      <div class="ts-step-body">
+        Is the routing protocol forming adjacencies? Are routes being advertised?<br><br>
+        <code>show ip ospf neighbor</code> — are neighbors in FULL state? (2-WAY for DROther is also normal)<br>
+        <code>show ip ospf interface [x]</code> — correct area, cost, hello/dead timers?<br>
+        <code>show ip route ospf</code> — are OSPF routes in the routing table?<br>
+        <code>debug ip ospf adj</code> — real-time adjacency events (use carefully in production!)<br><br>
+        <strong style="color:var(--white)">Common OSPF failure:</strong> Mismatched area numbers, mismatched hello/dead timers, network statement missing.
+      </div>
+    </div>
+
+    <div class="ts-step s6">
+      <div class="ts-step-num">STEP 06 — END-TO-END VERIFICATION</div>
+      <div class="ts-step-title">Confirm from Both Ends + Document the Fix</div>
+      <div class="ts-step-body">
+        Always test connectivity from both endpoints — not just one direction. Verify the service works end-to-end, not just layer-by-layer.<br><br>
+        <code>ping [destination] source [source-interface]</code> — source-specific ping<br>
+        <code>telnet [ip] [port]</code> — test if specific port is open<br>
+        <code>show logging</code> — check syslog for error messages<br><br>
+        <strong style="color:var(--white)">Document:</strong> What broke → What you checked → What the root cause was → What you fixed. This builds pattern recognition for future troubleshooting.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider">TROUBLESHOOTING CHEAT SHEET</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:8px">
+    <div class="hack-card" style="background:var(--panel);border:1px solid var(--border)">
+      <div style="padding:16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">SYMPTOM → CAUSE MAP</div>
+      </div>
+      <div style="padding:16px;font-size:13px;font-family:'Fira Code',monospace;color:var(--gray);line-height:2.2">
+        <div><span style="color:var(--red)">Late collisions</span> → Duplex mismatch</div>
+        <div><span style="color:var(--red)">CRC errors</span> → Bad cable / EMI</div>
+        <div><span style="color:var(--red)">Up/Down</span> → L2 config issue</div>
+        <div><span style="color:var(--red)">Down/Down</span> → Cable / L1 failure</div>
+        <div><span style="color:var(--red)">OSPF stuck INIT</span> → Hello mismatch</div>
+        <div><span style="color:var(--red)">No route</span> → Network stmt missing</div>
+        <div><span style="color:var(--red)">VLAN not working</span> → Check trunk VLANs</div>
+        <div><span style="color:var(--red)">169.254.x.x</span> → DHCP failed (APIPA)</div>
+      </div>
+    </div>
+    <div class="hack-card" style="background:var(--panel);border:1px solid var(--border)">
+      <div style="padding:16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime)">TOP 10 SHOW COMMANDS</div>
+      </div>
+      <div style="padding:16px;font-size:13px;font-family:'Fira Code',monospace;color:var(--gray);line-height:2.2">
+        <div><span style="color:var(--lime)">show ip int br</span> → All interface status</div>
+        <div><span style="color:var(--lime)">show ip route</span> → Full routing table</div>
+        <div><span style="color:var(--lime)">show run</span> → Full running config</div>
+        <div><span style="color:var(--lime)">show vlan br</span> → VLAN assignments</div>
+        <div><span style="color:var(--lime)">show int trunk</span> → Trunk status</div>
+        <div><span style="color:var(--lime)">show mac addr-table</span> → CAM table</div>
+        <div><span style="color:var(--lime)">show ip ospf neighbor</span> → OSPF peers</div>
+        <div><span style="color:var(--lime)">show arp</span> → IP-to-MAC mappings</div>
+        <div><span style="color:var(--lime)">show cdp neighbors</span> → Adjacent devices</div>
+        <div><span style="color:var(--lime)">show ip nat trans</span> → NAT table</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 8 — MEMORY TECHNIQUES
+═══════════════════════════════════════ -->
+<section id="memory">
+  <div class="section-tag">08 / MEMORY TECHNIQUES</div>
+  <h2 class="section-title">Lock It In — <span class="accent">Memory Methods</span></h2>
+
+  <div class="memory-grid">
+
+    <div class="mem-card">
+      <span class="mem-icon">🏛️</span>
+      <div class="mem-title">MEMORY PALACE — OSI Layers</div>
+      <div class="mem-body">
+        Assign OSI layers to rooms in your house. Walk through the house mentally to recall layers in order.
+        <code class="ex">
+          Front door = Physical (cables in/out)<br>
+          Hall = Data Link (MAC addresses, signs)<br>
+          Living room = Network (addresses, routing)<br>
+          Kitchen = Transport (port numbers, delivery)<br>
+          Bedroom = Session (persistent connections)<br>
+          Bathroom = Presentation (encoding, formatting)<br>
+          Attic = Application (what you actually use)
+        </code>
+        Mnemonic: <strong style="color:var(--lime)">Please Do Not Throw Sausage Pizza Away</strong>
+      </div>
+    </div>
+
+    <div class="mem-card">
+      <span class="mem-icon">🔢</span>
+      <div class="mem-title">CHUNKING — Port Numbers</div>
+      <div class="mem-body">
+        Group related ports together and memorise the group, not individual numbers.
+        <code class="ex">
+          Web ports: 80 (HTTP), 443 (HTTPS)<br>
+          Email trio: 25 SMTP · 110 POP3 · 143 IMAP<br>
+          File twins: 20 FTP-data · 21 FTP-control<br>
+          Management: 22 SSH · 23 Telnet<br>
+          UDP specials: 53 DNS · 67/68 DHCP · 69 TFTP<br>
+          Monitoring: 161/162 SNMP · 514 Syslog · 123 NTP
+        </code>
+      </div>
+    </div>
+
+    <div class="mem-card">
+      <span class="mem-icon">🎨</span>
+      <div class="mem-title">COLOUR CODING — Topology Diagrams</div>
+      <div class="mem-body">
+        Always draw topologies with the same colour scheme until it becomes automatic — colours create neural shortcuts.
+        <code class="ex">
+          🟢 Green = Routers (Layer 3, IP routing)<br>
+          🔵 Blue = Switches (Layer 2, MAC frames)<br>
+          🔴 Red = Firewalls / Security devices<br>
+          🟣 Purple = Access Points / Wireless<br>
+          🟡 Yellow = Servers / Services<br>
+          ⚪ Grey = Endpoints / PCs
+        </code>
+        When you see these colours in your mind, the layer and function come automatically.
+      </div>
+    </div>
+
+    <div class="mem-card">
+      <span class="mem-icon">🧩</span>
+      <div class="mem-title">ACRONYM ANCHORS — Private Ranges</div>
+      <div class="mem-body">
+        Build silly acronyms to anchor number ranges. The more ridiculous, the more memorable.
+        <code class="ex">
+          Private ranges: "Ten Hungry Ninjas"<br>
+          → 10.x.x.x (Class A — huge!)<br>
+          → 172.16–31.x.x (Class B — hungry range)<br>
+          → 192.168.x.x (Class C — narrow!)<br><br>
+          PoE standards: "After the Bell Tolls"<br>
+          → 802.3af = 15.4W (standard)<br>
+          → 802.3at = 30W (plus)<br>
+          → 802.3bt = 60–90W (ultra)
+        </code>
+      </div>
+    </div>
+
+    <div class="mem-card">
+      <span class="mem-icon">🔄</span>
+      <div class="mem-title">INTERLEAVING — Mix Topics Daily</div>
+      <div class="mem-body">
+        Blocked practice (same topic for hours) feels productive but creates shallow learning. Interleaved practice (mixing topics) feels harder but creates deeper, durable memory.
+        <code class="ex">
+          Block 1: Learn new topic (e.g. OSPF)<br>
+          Block 2: Subnetting practice (different topic)<br>
+          Review: VLANs (from 3 days ago)<br>
+          Flashcards: Mix of all topics<br><br>
+          The brain works harder to switch contexts —<br>
+          that extra effort = stronger long-term memory
+        </code>
+      </div>
+    </div>
+
+    <div class="mem-card">
+      <span class="mem-icon">✍️</span>
+      <div class="mem-title">HANDWRITING — Draw, Don't Type Notes</div>
+      <div class="mem-body">
+        Handwritten notes encode information more deeply than typed notes. The slower pace forces processing, not transcription.
+        <code class="ex">
+          ✅ Draw topology diagrams by hand<br>
+          ✅ Write subnet tables by hand<br>
+          ✅ Sketch OSI layers and what happens at each<br>
+          ✅ Write CLI commands and syntax by hand<br>
+          ✅ Brain dump journal = always handwritten<br><br>
+          Use digital tools only for Packet Tracer<br>
+          and practice questions — never for notes
+        </code>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     SECTION 9 — EXAM DAY CHECKLIST
+═══════════════════════════════════════ -->
+<section id="examday">
+  <div class="section-tag">09 / EXAM DAY</div>
+  <h2 class="section-title">Exam Day <span class="accent">Protocol</span></h2>
+
+  <div class="alert alert-red" style="margin-bottom:32px">
+    🚨 <strong>Book your exam BEFORE you feel ready.</strong> Having a real date creates urgency that no self-imposed deadline can match. Book it on Day 1 or Day 7 of your plan.
+  </div>
+
+  <div class="checklist">
+
+    <div class="cl-group">
+      <div class="cl-header lime">📅 WEEK BEFORE EXAM</div>
+      <div class="cl-items">
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Stop learning new material — revision only</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Review all brain dump journals</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Run 2 full timed mock exams</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Review your personal Trap List</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Memorise key command cheat sheet</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Confirm exam centre location and time</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Get valid government ID ready</div></div>
+      </div>
+    </div>
+
+    <div class="cl-group">
+      <div class="cl-header amber">🌙 NIGHT BEFORE</div>
+      <div class="cl-items">
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Light flashcard review only — 30 minutes max</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">NO new content, NO mock exams, NO cramming</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Lay out your clothes and ID</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Set alarm — arrive 30 mins early at centre</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">No screens 30 mins before sleep</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Sleep by 10pm — 8 hours minimum</div></div>
+      </div>
+    </div>
+
+    <div class="cl-group">
+      <div class="cl-header blue">☀️ EXAM MORNING</div>
+      <div class="cl-items">
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Eat a full protein breakfast — no sugar crash</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">5-minute mental recall — key facts only</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Arrive 30 minutes before exam start</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Water bottle — hydration keeps brain sharp</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Deep breath — you've put in 280 hours</div></div>
+      </div>
+    </div>
+
+    <div class="cl-group">
+      <div class="cl-header red">🎯 DURING THE EXAM</div>
+      <div class="cl-items">
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Brain dump first: write subnet tables and key facts on scratch paper before Q1</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">90 seconds average per question — keep pace</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Flag uncertain questions and return at end</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Read every answer option before choosing</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Eliminate obviously wrong answers first</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Never leave a question blank — always guess</div></div>
+        <div class="cl-item" onclick="toggleCheck(this)"><div class="cl-check"></div><div class="cl-text">Trust your preparation — first instinct is usually correct</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer style="background:var(--black);border-top:1px solid var(--border);padding:48px 64px;text-align:center">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--lime);margin-bottom:8px">YOU WILL PASS</div>
+  <div style="font-family:'Fira Code',monospace;font-size:12px;color:var(--gray2);letter-spacing:0.15em">CCNA 200-301 · 70-DAY BATTLE PLAN · TRUST THE SYSTEM</div>
+  <div style="margin-top:24px;font-size:14px;color:var(--gray2)">
+    Consistency > Intensity. 4 focused hours daily beats 12-hour cramming sessions every time.<br>
+    The network engineer you're becoming is built one session at a time.
+  </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════ -->
+<script>
+
+/* ── Reading progress bar ── */
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('reading-bar').style.width = Math.min(pct, 100) + '%';
+});
+
+/* ── Checklist toggle ── */
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  const check = el.querySelector('.cl-check');
+  check.textContent = el.classList.contains('checked') ? '✓' : '';
+}
+
+/* ═══════════════════════════════
+   POMODORO TIMER
+═══════════════════════════════ */
+let pomoInterval = null;
+let pomoSeconds = 45 * 60;
+let pomoRunning = false;
+let pomoSet = 0;
+let pomoPhase = 'study'; // study or break
+
+function setPomoTime(minutes, label) {
+  pomoReset();
+  pomoSeconds = minutes * 60;
+  document.getElementById('pomo-label').textContent = label;
+  updatePomoDisplay();
+}
+
+function updatePomoDisplay() {
+  const m = Math.floor(pomoSeconds / 60).toString().padStart(2, '0');
+  const s = (pomoSeconds % 60).toString().padStart(2, '0');
+  document.getElementById('pomo-display').textContent = `${m}:${s}`;
+}
+
+function pomoStart() {
+  if (pomoRunning) {
+    clearInterval(pomoInterval);
+    pomoRunning = false;
+    document.getElementById('pomo-start-btn').textContent = '▶ RESUME';
+    return;
+  }
+  pomoRunning = true;
+  document.getElementById('pomo-start-btn').textContent = '⏸ PAUSE';
+
+  // Mark active dot
+  if (pomoSet < 4) {
+    document.getElementById('pd' + pomoSet).classList.add('active');
+  }
+
+  pomoInterval = setInterval(() => {
+    pomoSeconds--;
+    updatePomoDisplay();
+
+    if (pomoSeconds <= 0) {
+      clearInterval(pomoInterval);
+      pomoRunning = false;
+      // Flash the display
+      const disp = document.getElementById('pomo-display');
+      let flashes = 0;
+      const flashInterval = setInterval(() => {
+        disp.style.opacity = disp.style.opacity === '0' ? '1' : '0';
+        if (++flashes > 8) { clearInterval(flashInterval); disp.style.opacity = '1'; }
+      }, 200);
+
+      // Mark dot done
+      if (pomoSet < 4) {
+        const dot = document.getElementById('pd' + pomoSet);
+        dot.classList.remove('active');
+        dot.classList.add('done');
+        pomoSet++;
+      }
+
+      document.getElementById('pomo-label').textContent = pomoSet >= 4 ? '🎉 LONG BREAK — GREAT WORK!' : '✅ SESSION DONE — TAKE YOUR BREAK!';
+      document.getElementById('pomo-start-btn').textContent = '▶ START';
+    }
+  }, 1000);
+}
+
+function pomoReset() {
+  clearInterval(pomoInterval);
+  pomoRunning = false;
+  pomoSeconds = 45 * 60;
+  pomoSet = 0;
+  updatePomoDisplay();
+  document.getElementById('pomo-label').textContent = 'STUDY BLOCK — READY TO START';
+  document.getElementById('pomo-start-btn').textContent = '▶ START';
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('pd' + i).className = 'pomo-dot';
+  }
+}
+
+/* ═══════════════════════════════
+   FLASHCARDS
+═══════════════════════════════ */
+const allCards = [
+  // FUNDAMENTALS
+  { cat: 'fundamentals', q: 'What layer do routers operate at, and what do they forward?', a: 'Layer 3 (Network). Routers forward IP <strong>packets</strong> based on destination IP address. Each router interface is a separate broadcast domain and subnet.' },
+  { cat: 'fundamentals', q: 'What is the difference between a collision domain and a broadcast domain?', a: '<strong>Collision domain:</strong> area where packet collisions can occur — broken by switches (each port = separate collision domain).<br><strong>Broadcast domain:</strong> area where broadcasts are received — broken only by <strong>routers</strong> or VLANs.' },
+  { cat: 'fundamentals', q: 'What command is REQUIRED on an L3 switch before inter-VLAN routing works?', a: '<code>ip routing</code> — this enables routing on the switch. Without it, SVIs are configured but traffic cannot be routed between VLANs. This is disabled by default.' },
+  { cat: 'fundamentals', q: 'What are the three non-overlapping Wi-Fi channels in 2.4GHz?', a: 'Channels <strong>1, 6, and 11</strong>. Each channel is 22MHz wide with 5MHz spacing — only these three have no overlap. Never assign adjacent APs the same channel.' },
+  { cat: 'fundamentals', q: 'What does a 169.254.x.x IP address tell you?', a: 'DHCP failure — the device could not reach a DHCP server and self-assigned an <strong>APIPA</strong> (Automatic Private IP Addressing) address in the 169.254.0.0/16 range. Check the DHCP server, cable, and network connectivity.' },
+  { cat: 'fundamentals', q: 'What PoE standard provides 30W per port?', a: '<strong>IEEE 802.3at (PoE+)</strong> = 30W. Standard PoE 802.3af = 15.4W. PoE++ 802.3bt = 60–90W. 802.3at is needed for dual-band 802.11ac access points.' },
+  { cat: 'fundamentals', q: 'What protocol do lightweight APs use to communicate with a WLC?', a: '<strong>CAPWAP</strong> (Control And Provisioning of Wireless Access Points) — UDP port <strong>5246</strong> for control traffic and UDP <strong>5247</strong> for data tunneling. Replaced the older Cisco-proprietary LWAPP.' },
+  { cat: 'fundamentals', q: 'What is the TCP three-way handshake sequence?', a: '<strong>SYN → SYN-ACK → ACK</strong><br>1. Client sends SYN (I want to connect)<br>2. Server replies SYN-ACK (OK, I\'m ready)<br>3. Client sends ACK (Connection established!)<br>Data transfer begins after step 3.' },
+  { cat: 'fundamentals', q: 'What does "late collisions" in show interfaces indicate?', a: '<strong>Duplex mismatch</strong> — one side is full-duplex, the other half-duplex. The half-duplex side uses CSMA/CD and detects collisions, but collisions occur after the 64-byte slot time = late collision. Speed mismatch causes link DOWN, not late collisions.' },
+  { cat: 'fundamentals', q: 'Name the three private IPv4 address ranges (RFC 1918)', a: '<strong>10.0.0.0/8</strong> — Class A (10.0.0.0 to 10.255.255.255)<br><strong>172.16.0.0/12</strong> — Class B (172.16.x.x to 172.<u>31</u>.x.x)<br><strong>192.168.0.0/16</strong> — Class C (192.168.0.0 to 192.168.255.255)' },
+
+  // SWITCHING
+  { cat: 'switching', q: 'How does a switch learn MAC addresses?', a: 'A switch reads the <strong>source MAC address</strong> of every incoming frame and records it in the CAM table with the ingress port and VLAN. It does NOT learn from destination MACs.' },
+  { cat: 'switching', q: 'What does a switch do with an unknown unicast frame?', a: '<strong>FLOOD</strong> — sends the frame out ALL ports except the ingress port. This is unknown unicast flooding. The switch never drops unknown frames. When the destination replies, it learns that MAC\'s port.' },
+  { cat: 'switching', q: 'What is the default MAC address aging time on Cisco switches?', a: '<strong>300 seconds (5 minutes)</strong>. If a device doesn\'t send traffic for 5 minutes, its entry is removed. Configurable with: <code>mac address-table aging-time [seconds]</code>' },
+  { cat: 'switching', q: 'What is the difference between access and trunk ports?', a: '<strong>Access port:</strong> carries traffic for ONE VLAN only. Used for end devices (PCs, phones).<br><strong>Trunk port:</strong> carries traffic for MULTIPLE VLANs using 802.1Q tagging. Used between switches and between switch and router.' },
+  { cat: 'switching', q: 'What command verifies which VLANs are allowed on a trunk?', a: '<code>show interfaces trunk</code><br>Shows: port mode, native VLAN, allowed VLANs, active VLANs, and VLANs in STP forwarding state. Check "VLANs allowed and active" column.' },
+  { cat: 'switching', q: 'What is STP and what problem does it solve?', a: 'Spanning Tree Protocol prevents <strong>Layer 2 loops</strong>. Without STP, broadcast frames would loop infinitely, consuming all bandwidth (broadcast storm). STP elects a root bridge and blocks redundant paths, keeping exactly one active path.' },
+
+  // ROUTING
+  { cat: 'routing', q: 'What is the difference between static and dynamic routing?', a: '<strong>Static routes:</strong> manually configured, don\'t adapt to topology changes, low overhead. Best for small networks or specific routes (default route).<br><strong>Dynamic routing</strong> (OSPF, EIGRP): automatically discovers and updates routes. Adapts to failures. Higher overhead but scalable.' },
+  { cat: 'routing', q: 'What command shows the full routing table on a Cisco router?', a: '<code>show ip route</code><br>Key codes: C = Connected, S = Static, O = OSPF, D = EIGRP, R = RIP, * = default route candidate. The best path per destination is installed in the table.' },
+  { cat: 'routing', q: 'What is OSPF neighbor state FULL mean?', a: 'FULL state means OSPF neighbors have fully exchanged LSA databases and are synchronized. They now share the same LSDB and can calculate optimal paths with SPF. FULL is the desired final state for point-to-point links.' },
+  { cat: 'routing', q: 'What is Administrative Distance (AD) and why does it matter?', a: 'AD is the trustworthiness of a routing source. Lower AD = more trusted = preferred route. Key values: Connected=0, Static=1, EIGRP=90, OSPF=110, RIP=120. If OSPF and EIGRP both know a route, EIGRP wins (90 < 110).' },
+
+  // IPv6
+  { cat: 'ipv6', q: 'What are the two IPv6 compression rules?', a: '1. <strong>Remove leading zeros</strong> from each 16-bit group (0DB8 → DB8, 0001 → 1)<br>2. <strong>Replace consecutive all-zero groups with ::</strong> — can only be used ONCE per address. Use :: for the LONGEST consecutive zero sequence.' },
+  { cat: 'ipv6', q: 'What command enables IPv6 routing on a Cisco router?', a: '<code>ipv6 unicast-routing</code><br>This is REQUIRED before any IPv6 routing works. Without it, the router will have IPv6 addresses but will not route between IPv6 networks.' },
+  { cat: 'ipv6', q: 'What is the EUI-64 process for generating an IPv6 interface ID?', a: '1. Take the 48-bit MAC address<br>2. Split in half and insert <strong>FF:FE</strong> in the middle (making it 64 bits)<br>3. Flip the <strong>7th bit</strong> (U/L bit) of the first octet<br>Result: unique 64-bit interface identifier' },
+  { cat: 'ipv6', q: 'What IPv6 address range is link-local and what is it used for?', a: '<strong>FE80::/10</strong> — automatically configured on every IPv6-enabled interface. Used for neighbour discovery, router advertisements, and routing protocol hellos. NOT routable beyond the local link. Required — IPv6 won\'t work without it.' },
+
+  // SECURITY
+  { cat: 'security', q: 'What is the difference between an IDS and an IPS?', a: '<strong>IDS (Intrusion Detection System):</strong> Detects and alerts — does NOT block traffic. Passive monitoring.<br><strong>IPS (Intrusion Prevention System):</strong> Detects AND blocks threats inline — active prevention.<br>NGFW includes IPS functionality.' },
+  { cat: 'security', q: 'What encryption does WPA2 use? What about WPA3?', a: '<strong>WPA2:</strong> AES-CCMP encryption (strong, current standard)<br><strong>WPA3:</strong> SAE (Simultaneous Authentication of Equals) + AES — provides forward secrecy and protects against offline dictionary attacks. WPA uses TKIP (deprecated). WEP is broken.' },
+  { cat: 'security', q: 'How does a standard ACL differ from an extended ACL?', a: '<strong>Standard ACL:</strong> Filters by source IP only. Numbered 1–99, 1300–1999. Place CLOSE to destination.<br><strong>Extended ACL:</strong> Filters by source IP, destination IP, protocol, and port. Numbered 100–199, 2000–2699. Place CLOSE to source.' },
+
+  // WIRELESS
+  { cat: 'wireless', q: 'What is the difference between BSS and ESS?', a: '<strong>BSS (Basic Service Set):</strong> One AP + its associated clients. Identified by the BSSID (AP\'s MAC address).<br><strong>ESS (Extended Service Set):</strong> Multiple APs sharing the same SSID, allowing seamless roaming between APs.' },
+  { cat: 'wireless', q: 'What is CAPWAP and what ports does it use?', a: '<strong>CAPWAP</strong> (Control And Provisioning of Wireless APs) manages lightweight APs from a WLC.<br>UDP <strong>5246</strong> — control channel (management)<br>UDP <strong>5247</strong> — data channel (client traffic tunneled to WLC)' },
+];
+
+let currentDeck = [...allCards];
+let currentIndex = 0;
+let isFlipped = false;
+
+function filterCards(cat, btn) {
+  currentDeck = cat === 'all' ? [...allCards] : allCards.filter(c => c.cat === cat);
+  currentIndex = 0;
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-rating').style.display = 'none';
+  document.querySelectorAll('.flashcard-controls .fc-btn').forEach(b => {
+    b.className = b.className.replace('fc-active', '').trim();
+  });
+  if (btn) {
+    btn.classList.add('fc-active');
+    const orig = btn.className.split(' ').find(c => c.startsWith('fc-') && c !== 'fc-btn' && c !== 'fc-active');
+    if (orig) btn.className = `fc-btn fc-active`;
+  }
+  document.getElementById('fc-cat-label').textContent = cat.toUpperCase();
+  loadCard();
+}
+
+function loadCard() {
+  if (currentDeck.length === 0) return;
+  const card = currentDeck[currentIndex];
+  document.getElementById('fc-question').textContent = card.q;
+  document.getElementById('fc-answer').innerHTML = card.a;
+  document.getElementById('fc-current').textContent = currentIndex + 1;
+  document.getElementById('fc-total').textContent = currentDeck.length;
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-rating').style.display = 'none';
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+  document.getElementById('fc-rating').style.display = isFlipped ? 'flex' : 'none';
+}
+
+function nextCard() {
+  currentIndex = (currentIndex + 1) % currentDeck.length;
+  loadCard();
+}
+
+function prevCard() {
+  currentIndex = (currentIndex - 1 + currentDeck.length) % currentDeck.length;
+  loadCard();
+}
+
+function rateCard(difficulty) {
+  // Visual feedback
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✓ Noted!';
+  setTimeout(() => { btn.textContent = orig; nextCard(); }, 600);
+}
+
+// Init flashcards
+loadCard();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,3067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCNA 200-301 | Section 6.0 — Automation & Programmability</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020817;
+  --bg-card: #0f172a;
+  --bg-elevated: #1e293b;
+  --border: #334155;
+  --text: #f8fafc;
+  --text-dim: #94a3b8;
+  --blue: #3b82f6;
+  --cyan: #06b6d4;
+  --green: #4ade80;
+  --purple: #c084fc;
+  --violet: #a78bfa;
+  --orange: #f97316;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --yellow: #facc15;
+  --code-green: #4ade80;
+  --nb-api: #c084fc;
+  --sb-api: #fb923c;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── CIRCUIT BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(59,130,246,0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(6,182,212,0.04) 0%, transparent 50%),
+    linear-gradient(rgba(59,130,246,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 60px 60px, 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  animation: bgShift 30s linear infinite;
+}
+
+@keyframes bgShift {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 0 0, 0 0, 60px 60px, 60px 60px; }
+}
+
+/* ── PROGRESS BAR ── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan), var(--purple));
+  z-index: 1000;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px var(--cyan);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 3px; }
+
+/* ── TYPOGRAPHY ── */
+h1, h2, .orbitron { font-family: 'Orbitron', monospace; }
+h3, h4, .grotesk { font-family: 'Space Grotesk', sans-serif; }
+code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ── SIDEBAR ── */
+#sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 260px;
+  height: 100vh;
+  background: rgba(15,23,42,0.97);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 200;
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s;
+}
+
+#sidebar::-webkit-scrollbar { width: 3px; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+.sb-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(30,41,59,0.5);
+}
+
+.sb-brand {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.sb-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  padding: 10px 16px 4px;
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+.sb-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.sb-link:hover { color: var(--cyan); border-left-color: rgba(6,182,212,0.4); background: rgba(6,182,212,0.04); }
+.sb-link.active { color: var(--cyan); border-left-color: var(--cyan); background: rgba(6,182,212,0.07); }
+
+.sb-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.sb-link.mastered .sb-dot { background: var(--green); border-color: var(--green); }
+
+.master-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.master-btn.done { border-color: var(--green); color: var(--green); background: rgba(74,222,128,0.08); }
+
+.progress-wrap { margin-top: 12px; }
+.progress-label { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim); margin-bottom: 5px; }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--cyan)); border-radius: 2px; transition: width 0.5s; width: 0%; }
+
+.sb-score {
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.sb-score span { color: var(--green); font-size: 16px; font-family: 'Orbitron', monospace; }
+
+/* ── MAIN ── */
+#main { margin-left: 260px; position: relative; z-index: 1; }
+
+/* ── HERO ── */
+.hero {
+  padding: 80px 56px 72px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -100px; right: -100px;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--cyan); }
+
+.hero h1 {
+  font-size: clamp(32px, 5vw, 60px);
+  color: var(--text);
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.hero h1 span { color: var(--blue); }
+
+.hero-badges { display: flex; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
+
+/* ── SECTION BLOCKS ── */
+.section-block {
+  padding: 60px 56px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.section-block:nth-child(even) { background: rgba(15,23,42,0.4); }
+
+/* ── HEX BADGE ── */
+.section-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px; height: 56px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.4);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  color: var(--blue);
+  font-weight: 900;
+  margin-bottom: 20px;
+}
+
+.section-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--cyan); }
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover { border-color: rgba(59,130,246,0.3); box-shadow: 0 0 20px rgba(59,130,246,0.08); }
+
+.card-glow-blue  { border-color: rgba(59,130,246,0.3);  box-shadow: 0 0 30px rgba(59,130,246,0.06); }
+.card-glow-cyan  { border-color: rgba(6,182,212,0.3);   box-shadow: 0 0 30px rgba(6,182,212,0.06); }
+.card-glow-green { border-color: rgba(74,222,128,0.3);  box-shadow: 0 0 30px rgba(74,222,128,0.06); }
+.card-glow-purple{ border-color: rgba(192,132,252,0.3); box-shadow: 0 0 30px rgba(192,132,252,0.06); }
+
+/* ── CALLOUT BOXES ── */
+.callout {
+  padding: 14px 18px;
+  border-radius: 6px;
+  border-left: 4px solid;
+  margin: 14px 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.callout-exam   { border-color: var(--cyan);   background: rgba(6,182,212,0.06);   color: var(--cyan); }
+.callout-fact   { border-color: var(--green);  background: rgba(74,222,128,0.06);  color: var(--green); }
+.callout-real   { border-color: var(--violet); background: rgba(167,139,250,0.06); color: var(--violet); }
+.callout-memo   { border-color: var(--amber);  background: rgba(245,158,11,0.06);  color: var(--amber); }
+
+.callout-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.callout-text { color: var(--text); font-size: 13px; }
+
+/* ── CODE BLOCKS ── */
+.code-block {
+  background: #000;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 14px 0;
+  position: relative;
+}
+
+.code-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  pointer-events: none;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(30,41,59,0.8);
+  border-bottom: 1px solid #1e293b;
+}
+
+.lang-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.copy-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(6,182,212,0.3);
+  background: rgba(6,182,212,0.07);
+  color: var(--cyan);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover { background: rgba(6,182,212,0.18); }
+
+.code-body {
+  padding: 16px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--code-green);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* JSON syntax */
+.j-key     { color: #60a5fa; }
+.j-str     { color: #4ade80; }
+.j-num     { color: #fb923c; }
+.j-bool    { color: #a78bfa; }
+.j-null    { color: #94a3b8; }
+.j-brace   { color: #f8fafc; }
+.j-comment { color: #475569; font-style: italic; }
+
+/* Python syntax */
+.p-kw      { color: #c084fc; }
+.p-str     { color: #4ade80; }
+.p-comment { color: #475569; font-style: italic; }
+.p-fn      { color: #60a5fa; }
+.p-num     { color: #fb923c; }
+
+/* YAML */
+.y-key     { color: #60a5fa; }
+.y-str     { color: #4ade80; }
+.y-comment { color: #475569; font-style: italic; }
+.y-dash    { color: #fb923c; }
+
+/* CLI */
+.cli-prompt  { color: #00ffaa; }
+.cli-comment { color: #475569; font-style: italic; }
+.cli-output  { color: #94a3b8; }
+.cli-hl      { color: #fbbf24; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  border: 1px solid;
+  font-weight: 500;
+}
+
+.badge-blue   { color: var(--blue);   border-color: rgba(59,130,246,0.4);  background: rgba(59,130,246,0.1); }
+.badge-cyan   { color: var(--cyan);   border-color: rgba(6,182,212,0.4);   background: rgba(6,182,212,0.1); }
+.badge-green  { color: var(--green);  border-color: rgba(74,222,128,0.4);  background: rgba(74,222,128,0.1); }
+.badge-purple { color: var(--purple); border-color: rgba(192,132,252,0.4); background: rgba(192,132,252,0.1); }
+.badge-orange { color: var(--orange); border-color: rgba(249,115,22,0.4);  background: rgba(249,115,22,0.1); }
+.badge-amber  { color: var(--amber);  border-color: rgba(245,158,11,0.4);  background: rgba(245,158,11,0.1); }
+.badge-red    { color: var(--red);    border-color: rgba(239,68,68,0.4);   background: rgba(239,68,68,0.1); }
+.badge-violet { color: var(--violet); border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.1); }
+
+/* HTTP verb badges */
+.http-get    { color: #22c55e; border-color: rgba(34,197,94,0.4);  background: rgba(34,197,94,0.1); }
+.http-post   { color: #3b82f6; border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.1); }
+.http-put    { color: #f59e0b; border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.1); }
+.http-patch  { color: #f97316; border-color: rgba(249,115,22,0.4); background: rgba(249,115,22,0.1); }
+.http-delete { color: #ef4444; border-color: rgba(239,68,68,0.4);  background: rgba(239,68,68,0.1); }
+
+/* ── TABLES ── */
+table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+th { background: rgba(6,182,212,0.08); color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.1em; padding: 10px 14px; text-align: left; border: 1px solid var(--border); text-transform: uppercase; }
+td { padding: 9px 14px; border: 1px solid var(--border); color: var(--text-dim); }
+tr:hover td { background: rgba(255,255,255,0.01); }
+
+/* ── DIAGRAM CONTAINERS ── */
+.diagram-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.diagram-titlebar {
+  background: rgba(0,0,0,0.4);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dtbar-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── ANIMATIONS ── */
+@keyframes flowRight {
+  0%   { stroke-dashoffset: 100; opacity: 0.2; }
+  50%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.2; }
+}
+
+@keyframes flowLeft {
+  0%   { stroke-dashoffset: 0; opacity: 0.2; }
+  50%  { opacity: 1; }
+  100% { stroke-dashoffset: 100; opacity: 0.2; }
+}
+
+@keyframes flowDown {
+  0%   { stroke-dashoffset: 120; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes pulseDot {
+  0%, 100% { r: 6; opacity: 1; }
+  50%       { r: 9; opacity: 0.5; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 4px currentColor); }
+  50%       { filter: drop-shadow(0 0 14px currentColor); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes typeLine {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.anim-flow-d  { stroke-dasharray: 8 4; animation: flowDown 1.4s linear infinite; }
+.anim-flow-r  { stroke-dasharray: 8 4; animation: flowRight 1.6s ease-in-out infinite; }
+.anim-flow-l  { stroke-dasharray: 8 4; animation: flowLeft 1.6s ease-in-out infinite; }
+.anim-pulse   { animation: pulseDot 2s ease-in-out infinite; }
+.anim-glow    { animation: glowPulse 2s ease-in-out infinite; }
+
+/* ── INTERACTIVE WIDGETS ── */
+.widget-panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.widget-header {
+  background: rgba(6,182,212,0.07);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--cyan);
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.widget-body { padding: 20px; }
+
+/* ── INPUT / BUTTON ── */
+.inp {
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--code-green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 9px 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.inp:focus { border-color: var(--cyan); }
+
+.btn {
+  padding: 8px 18px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.btn-blue   { background: rgba(59,130,246,0.1);  border-color: rgba(59,130,246,0.4);  color: var(--blue); }
+.btn-cyan   { background: rgba(6,182,212,0.1);   border-color: rgba(6,182,212,0.4);   color: var(--cyan); }
+.btn-green  { background: rgba(74,222,128,0.1);  border-color: rgba(74,222,128,0.4);  color: var(--green); }
+.btn-red    { background: rgba(239,68,68,0.1);   border-color: rgba(239,68,68,0.4);   color: var(--red); }
+.btn-amber  { background: rgba(245,158,11,0.1);  border-color: rgba(245,158,11,0.4);  color: var(--amber); }
+.btn-purple { background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.4); color: var(--purple); }
+
+.btn-blue:hover   { background: rgba(59,130,246,0.2); }
+.btn-cyan:hover   { background: rgba(6,182,212,0.2); }
+.btn-green:hover  { background: rgba(74,222,128,0.2); }
+.btn-red:hover    { background: rgba(239,68,68,0.2); }
+.btn-amber:hover  { background: rgba(245,158,11,0.2); }
+.btn-purple:hover { background: rgba(192,132,252,0.2); }
+
+/* ── QUIZ ── */
+.quiz-q { font-size: 14px; color: var(--text); margin-bottom: 14px; line-height: 1.6; }
+
+.q-option {
+  display: block; width: 100%;
+  text-align: left;
+  padding: 11px 16px;
+  margin: 6px 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.q-option:hover:not(:disabled) { border-color: var(--cyan); background: rgba(6,182,212,0.05); }
+.q-option.correct  { border-color: #10b981; background: rgba(16,185,129,0.1); color: #10b981; }
+.q-option.wrong    { border-color: var(--red); background: rgba(239,68,68,0.1); color: var(--red); }
+.q-option:disabled { cursor: default; }
+
+.q-exp {
+  margin-top: 12px; padding: 12px 16px;
+  border-left: 3px solid var(--cyan);
+  background: rgba(6,182,212,0.05);
+  font-size: 13px; color: var(--text-dim);
+  border-radius: 0 4px 4px 0;
+  display: none;
+  line-height: 1.65;
+}
+
+/* ── SUMMARY BOX ── */
+.summary-box {
+  border: 1px solid rgba(245,158,11,0.3);
+  background: rgba(245,158,11,0.04);
+  border-radius: 6px;
+  padding: 20px 22px;
+  margin-top: 20px;
+}
+
+.summary-label {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: var(--amber);
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+}
+
+.summary-list { list-style: none; font-size: 13.5px; color: var(--text-dim); line-height: 2.2; }
+.summary-list li::before { content: '▸ '; color: var(--cyan); }
+
+/* ── ANSIBLE TERMINAL ── */
+.ansible-terminal {
+  background: #000;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.9;
+  min-height: 200px;
+}
+
+.ans-header { color: #facc15; font-weight: 700; }
+.ans-task   { color: #94a3b8; }
+.ans-ok     { color: #4ade80; }
+.ans-changed{ color: #fb923c; }
+.ans-failed { color: #ef4444; }
+.ans-recap  { color: #60a5fa; font-weight: 700; }
+
+/* ── SDN COMPARISON ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.compare-traditional {
+  background: rgba(100,116,139,0.08);
+  border: 1px solid rgba(100,116,139,0.3);
+  border-radius: 6px;
+  padding: 18px;
+}
+
+.compare-sdn {
+  background: rgba(74,222,128,0.05);
+  border: 1px solid rgba(74,222,128,0.3);
+  border-radius: 6px;
+  padding: 18px;
+}
+
+/* ── JSON TREE ── */
+.json-node { padding: 3px 0; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.json-node-children { padding-left: 18px; border-left: 1px solid rgba(255,255,255,0.06); margin-left: 6px; }
+.json-type-badge { font-size: 9px; padding: 1px 5px; border-radius: 2px; margin-left: 6px; font-family: 'JetBrains Mono', monospace; }
+
+/* ── MOBILE ── */
+#menu-btn { display: none; position: fixed; top: 12px; left: 12px; z-index: 300; padding: 8px; background: var(--bg-card); border: 1px solid var(--border); color: var(--cyan); border-radius: 5px; cursor: pointer; font-size: 18px; }
+
+@media (max-width: 900px) {
+  #sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-left: 0; }
+  #menu-btn { display: block; }
+  .section-block { padding: 40px 20px; }
+  .hero { padding: 70px 20px 50px; }
+  .compare-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<button id="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav id="sidebar">
+  <div class="sb-header">
+    <div class="sb-brand">CCNA 200-301</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:3px;letter-spacing:0.1em">SECTION 6.0 · AUTOMATION</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Mastered</span><span><span id="mastered-count">0</span>/7</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="sb-section-label">Topics</div>
+  <a class="sb-link" href="#s61" data-id="s61"><span class="sb-dot"></span>6.1 Automation Impact<button class="master-btn" onclick="toggleMaster(event,'s61')">✓</button></a>
+  <a class="sb-link" href="#s62" data-id="s62"><span class="sb-dot"></span>6.2 Traditional vs SDN<button class="master-btn" onclick="toggleMaster(event,'s62')">✓</button></a>
+  <a class="sb-link" href="#s63" data-id="s63"><span class="sb-dot"></span>6.3 SDN Architecture<button class="master-btn" onclick="toggleMaster(event,'s63')">✓</button></a>
+  <a class="sb-link" href="#s64" data-id="s64"><span class="sb-dot"></span>6.4 AI &amp; ML<button class="master-btn" onclick="toggleMaster(event,'s64')">✓</button></a>
+  <a class="sb-link" href="#s65" data-id="s65"><span class="sb-dot"></span>6.5 REST APIs<button class="master-btn" onclick="toggleMaster(event,'s65')">✓</button></a>
+  <a class="sb-link" href="#s66" data-id="s66"><span class="sb-dot"></span>6.6 Config Management<button class="master-btn" onclick="toggleMaster(event,'s66')">✓</button></a>
+  <a class="sb-link" href="#s67" data-id="s67"><span class="sb-dot"></span>6.7 JSON Data<button class="master-btn" onclick="toggleMaster(event,'s67')">✓</button></a>
+
+  <div class="sb-section-label">Labs</div>
+  <a class="sb-link" href="#lab1"><span class="sb-dot" style="background:rgba(74,222,128,0.3)"></span>Lab 1 · Python REST API</a>
+  <a class="sb-link" href="#lab2"><span class="sb-dot" style="background:rgba(74,222,128,0.3)"></span>Lab 2 · Ansible Automation</a>
+  <a class="sb-link" href="#lab3"><span class="sb-dot" style="background:rgba(74,222,128,0.3)"></span>Lab 3 · NETCONF/RESTCONF</a>
+  <a class="sb-link" href="#lab4"><span class="sb-dot" style="background:rgba(74,222,128,0.3)"></span>Lab 4 · JSON Parsing</a>
+
+  <div class="sb-section-label">Tools</div>
+  <a class="sb-link" href="#widget-api"><span class="sb-dot" style="background:rgba(6,182,212,0.4)"></span>REST API Console</a>
+  <a class="sb-link" href="#widget-json"><span class="sb-dot" style="background:rgba(250,204,21,0.4)"></span>JSON Tree Visualizer</a>
+  <a class="sb-link" href="#widget-ansible"><span class="sb-dot" style="background:rgba(239,68,68,0.4)"></span>Ansible Simulator</a>
+
+  <div class="sb-score">
+    Quiz Score: <span id="score-display">0</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)"> / 28</span>
+  </div>
+</nav>
+
+<!-- ══════════ MAIN ══════════ -->
+<main id="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Section 6.0 — Complete Study Guide</div>
+  <h1>Automation &amp; <span>Programmability</span></h1>
+  <p style="color:var(--text-dim);max-width:640px;font-size:15px;margin-top:14px;font-family:'Space Grotesk',sans-serif">
+    The final and most modern section of CCNA 200-301. Covers SDN architectures, REST APIs, Ansible, Terraform, AI/ML in networking, and JSON — with interactive labs, working code, and exam-ready summaries.
+  </p>
+  <div class="hero-badges">
+    <span class="badge badge-blue">TOPICS 6.1–6.7</span>
+    <span class="badge badge-cyan">7 GNS3 LABS</span>
+    <span class="badge badge-green">28 QUIZ QUESTIONS</span>
+    <span class="badge badge-purple">INTERACTIVE TOOLS</span>
+    <span class="badge badge-amber">EXAM WEIGHT: 15%</span>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     6.1 — AUTOMATION IMPACT
+════════════════════════════════════ -->
+<section class="section-block" id="s61" data-section="s61">
+<div class="section-eyebrow">TOPIC 6.1</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:26px;color:var(--text);margin-bottom:24px">How Automation Impacts Network Management</h2>
+
+<p style="color:var(--text-dim);max-width:760px;margin-bottom:28px">
+  Network automation fundamentally changes how engineers interact with infrastructure — shifting from device-by-device CLI management to intent-based, programmatic control at massive scale. Understanding this shift is essential for the CCNA exam and for your career.
+</p>
+
+<!-- CONCEPT CARD -->
+<div class="card card-glow-blue">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:18px;color:var(--blue);margin-bottom:16px">① The Traditional Network Management Problem</h3>
+
+  <p style="color:var(--text-dim);margin-bottom:16px">Modern enterprise networks contain hundreds to thousands of devices. Before automation, every configuration change required an engineer to SSH into each device individually, type commands, verify results, and repeat — device by device.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0">
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:6px;padding:16px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--red);font-weight:600;margin-bottom:10px">❌ BEFORE AUTOMATION</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.9">
+        <div>• SSH to each device <span style="color:var(--red)">individually</span></div>
+        <div>• Copy-paste commands (error-prone)</div>
+        <div>• No validation before pushing config</div>
+        <div>• No rollback if something breaks</div>
+        <div>• <span style="color:var(--red)">Hours or days</span> per large change</div>
+        <div>• <span style="color:var(--red)">Configuration drift</span> over time</div>
+        <div>• 500 devices = 500 opportunities for error</div>
+        <div>• ~80% of outages caused by human error</div>
+      </div>
+    </div>
+    <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.25);border-radius:6px;padding:16px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--green);font-weight:600;margin-bottom:10px">✅ AFTER AUTOMATION</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.9">
+        <div>• One script or playbook for <span style="color:var(--green)">ALL devices</span></div>
+        <div>• Validated before pushing (dry-run)</div>
+        <div>• Version-controlled in Git</div>
+        <div>• Rollback to any previous state</div>
+        <div>• <span style="color:var(--green)">Minutes</span> per change, any scale</div>
+        <div>• Continuous compliance checking</div>
+        <div>• 1 engineer manages 1,000+ devices</div>
+        <div>• Automated self-healing for known issues</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-exam">
+    <span class="callout-label">⚡ Exam Tip</span>
+    <span class="callout-text"><strong>Configuration drift</strong> is the condition where network devices gradually diverge from their intended state due to undocumented manual changes, emergency fixes, or version differences. Automation prevents drift by continuously enforcing intended state.</span>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--cyan);margin:24px 0 14px">Impact Areas — What Automation Changes</h3>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:16px">
+
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);margin-bottom:8px">CONFIGURATION MANAGEMENT</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+        <div>Deploy config to all devices <strong style="color:var(--text)">simultaneously</strong></div>
+        <div>Template-based: one template, parameterized per device</div>
+        <div>Tools: <strong style="color:var(--red)">Ansible</strong>, <strong style="color:var(--violet)">Terraform</strong>, NAPALM, Nornir</div>
+        <div>Version control: every change tracked in <strong style="color:var(--text)">Git</strong></div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--blue);margin-bottom:8px">NETWORK MONITORING</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+        <div><strong style="color:var(--text)">Telemetry streaming</strong> (push) replaces SNMP polling (pull)</div>
+        <div>Sub-second metrics from every device</div>
+        <div>Real-time dashboards (Grafana + InfluxDB)</div>
+        <div><strong style="color:var(--text)">Intent verification</strong>: is network doing what I wanted?</div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--violet);margin-bottom:8px">PROVISIONING</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+        <div><strong style="color:var(--text)">Zero-Touch Provisioning (ZTP)</strong>:</div>
+        <div>New device boots → contacts server → downloads config</div>
+        <div>Zero manual SSH required</div>
+        <div>Cisco DNA Center: push configs to 1,000 devices</div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--orange);margin-bottom:8px">TROUBLESHOOTING</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+        <div>Automated root cause analysis</div>
+        <div>AI correlates events across hundreds of devices</div>
+        <div>Time-to-resolve: <strong style="color:var(--orange)">hours → minutes</strong></div>
+        <div>Predictive: catch issues BEFORE users notice</div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--red);margin-bottom:8px">SECURITY AUTOMATION</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+        <div>Automated threat response via API</div>
+        <div>Isolate infected host: push ACL/port shutdown automatically</div>
+        <div>Compliance scanning: check every device against policy</div>
+        <div>Flag deviations instantly with zero human delay</div>
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--amber);margin-bottom:8px">VERSION CONTROL (GIT)</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+        <div>All configs stored in Git repository</div>
+        <div>Track: who changed what, when, why</div>
+        <div>Rollback to any previous state in seconds</div>
+        <div>Peer review of changes before pushing (PRs)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout callout-memo">
+    <span class="callout-label">📌 Memorize</span>
+    <span class="callout-text"><strong>Automation skill shift:</strong> Network engineers of today = CLI experts. Engineers of tomorrow = CLI + Python + Ansible + APIs + Git. Key languages: Python (most common), YAML (config), JSON (data). Key tools: Ansible, Terraform, Git, Docker, Nornir.</span>
+  </div>
+</div>
+
+<!-- REAL-WORLD SCENARIO -->
+<div class="card card-glow-purple">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--violet);margin-bottom:16px">② Real-World Scenario — GlobalBank Financial Services</h3>
+
+  <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;margin-bottom:16px;align-items:start">
+    <div style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);border-radius:4px;padding:10px 14px;white-space:nowrap">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--violet);letter-spacing:0.1em">ENGINEER</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--text);font-weight:600">Abubakar Musa</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)">Network Automation Eng.</div>
+    </div>
+    <div style="font-size:13.5px;color:var(--text-dim);line-height:1.7">
+      <strong style="color:var(--text)">Company:</strong> GlobalBank — 847 branch locations across West Africa, 2,400 network devices (routers, switches, firewalls), compliance-driven environment with strict change management policies.
+    </div>
+  </div>
+
+  <div style="margin-bottom:14px">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--red);margin-bottom:8px">📍 BEFORE: The Manual Pain</div>
+    <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+      A critical security policy update requires adding an ACL to every branch router (847 devices). Each SSH session takes ~4 minutes: connect, authenticate, type 6 commands, verify, disconnect. With one engineer: <strong style="color:var(--red)">847 × 4 minutes = 3,388 minutes = 56.5 hours</strong> of work — a full week. During this time, misconfiguration risk is enormous. 3 devices are accidentally left without the ACL due to copy-paste error. The compliance audit fails.
+    </div>
+  </div>
+
+  <div style="margin-bottom:14px">
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">✅ AFTER: Automation</div>
+    <div style="font-size:13px;color:var(--text-dim);line-height:1.8">
+      Abubakar writes an Ansible playbook. It: validates the ACL syntax, runs in dry-run mode first, pushes to all 847 routers simultaneously, verifies application on each device, and saves a compliance report. Total time: <strong style="color:var(--green)">14 minutes</strong>. Zero copy-paste errors. Every device identical. Compliance audit passes.
+    </div>
+  </div>
+
+  <div class="callout callout-real">
+    <span class="callout-label">🌍 Real World</span>
+    <span class="callout-text"><strong>What if?</strong> The policy update had a bug that would break routing. With manual: Abubakar discovers the problem after configuring device 423 — half the network is broken. With automation: the dry-run catches the error before any device is touched. Fix the playbook. Re-run. All 847 devices configured correctly in one safe operation.
+    <br><br><strong>Complication:</strong> Branch 114 in Kano has an older IOS version that doesn't support the new ACL syntax. Ansible's when condition handles this: <code style="color:var(--green)">when: ansible_net_version is version('15.2','&gt;=')</code> — automatically skips that device and logs it for manual handling.</span>
+  </div>
+</div>
+
+<!-- ANIMATED DIAGRAM -->
+<div class="diagram-box">
+  <div class="diagram-titlebar">
+    <div class="dtbar-dot" style="background:#ef4444"></div>
+    <div class="dtbar-dot" style="background:#fbbf24"></div>
+    <div class="dtbar-dot" style="background:#4ade80"></div>
+    &nbsp; ANIMATED — Traditional CLI (56 hours) vs Automation (14 minutes)
+  </div>
+  <svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;padding:16px">
+    <!-- Traditional side -->
+    <text x="160" y="30" text-anchor="middle" fill="#64748b" font-family="Orbitron" font-size="11" font-weight="700">TRADITIONAL</text>
+    <text x="160" y="44" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="9">847 devices × 4 min = 56 hours</text>
+
+    <!-- Engineer icon -->
+    <circle cx="60" cy="90" r="18" fill="#0f172a" stroke="#64748b" stroke-width="1.5"/>
+    <text x="60" y="95" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="10">👤</text>
+    <text x="60" y="115" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">Engineer</text>
+
+    <!-- 5 routers, each needing individual config -->
+    <rect x="115" y="72" width="38" height="24" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+    <text x="134" y="88" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">R1</text>
+    <rect x="162" y="72" width="38" height="24" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+    <text x="181" y="88" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">R2</text>
+    <rect x="209" y="72" width="38" height="24" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+    <text x="228" y="88" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">R3</text>
+    <rect x="138" y="116" width="38" height="24" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+    <text x="157" y="132" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">R4</text>
+    <rect x="185" y="116" width="38" height="24" rx="3" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+    <text x="204" y="132" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">R5</text>
+
+    <!-- Sequential SSH arrows (slow, one at a time) -->
+    <line x1="78" y1="84" x2="112" y2="84" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3">
+      <animate attributeName="stroke-dashoffset" values="14;0" dur="3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="152" y1="84" x2="158" y2="84" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3">
+      <animate attributeName="stroke-dashoffset" values="14;0" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+    </line>
+    <line x1="200" y1="84" x2="205" y2="84" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3">
+      <animate attributeName="stroke-dashoffset" values="14;0" dur="3s" begin="1s" repeatCount="indefinite"/>
+    </line>
+
+    <!-- Error badge -->
+    <rect x="138" y="150" width="80" height="18" rx="3" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="1"/>
+    <text x="178" y="163" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">COPY-PASTE ERROR !</text>
+
+    <!-- Time label -->
+    <rect x="100" y="180" width="120" height="22" rx="3" fill="rgba(239,68,68,0.1)" stroke="#ef4444" stroke-width="1"/>
+    <text x="160" y="195" text-anchor="middle" fill="#ef4444" font-family="Orbitron" font-size="11" font-weight="700">56.5 HOURS</text>
+
+    <!-- Divider -->
+    <line x1="400" y1="20" x2="400" y2="260" stroke="#334155" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+    <!-- Automation side -->
+    <text x="590" y="30" text-anchor="middle" fill="#4ade80" font-family="Orbitron" font-size="11" font-weight="700">AUTOMATION</text>
+    <text x="590" y="44" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="9">1 playbook → 847 devices simultaneously</text>
+
+    <!-- Ansible controller -->
+    <rect x="495" y="68" width="90" height="36" rx="5" fill="#0f172a" stroke="#ef4444" stroke-width="2"/>
+    <text x="540" y="82" text-anchor="middle" fill="#ef4444" font-family="Orbitron" font-size="9">ANSIBLE</text>
+    <text x="540" y="93" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">Control Node</text>
+
+    <!-- 5 devices (parallel) -->
+    <rect x="620" y="55" width="36" height="22" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="638" y="70" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">R1</text>
+    <rect x="660" y="55" width="36" height="22" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="678" y="70" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">R2</text>
+    <rect x="700" y="55" width="36" height="22" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="718" y="70" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">R3</text>
+    <rect x="638" y="100" width="36" height="22" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="656" y="115" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">R4</text>
+    <rect x="678" y="100" width="36" height="22" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+    <text x="696" y="115" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">R5</text>
+
+    <!-- Parallel push arrows (all at once) -->
+    <line x1="585" y1="76" x2="618" y2="66" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-r"/>
+    <line x1="585" y1="82" x2="658" y2="66" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-r" style="animation-delay:.2s"/>
+    <line x1="585" y1="86" x2="698" y2="66" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-r" style="animation-delay:.4s"/>
+    <line x1="585" y1="90" x2="655" y2="111" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-r" style="animation-delay:.1s"/>
+    <line x1="585" y1="94" x2="695" y2="111" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-r" style="animation-delay:.3s"/>
+
+    <!-- Success badges -->
+    <rect x="488" y="150" width="110" height="18" rx="3" fill="rgba(74,222,128,0.12)" stroke="#4ade80" stroke-width="1"/>
+    <text x="543" y="163" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">✓ VALIDATED + VERIFIED</text>
+
+    <!-- Time label -->
+    <rect x="488" y="180" width="110" height="22" rx="3" fill="rgba(74,222,128,0.1)" stroke="#4ade80" stroke-width="1"/>
+    <text x="543" y="195" text-anchor="middle" fill="#4ade80" font-family="Orbitron" font-size="11" font-weight="700">14 MINUTES</text>
+
+    <!-- Speedup label -->
+    <rect x="440" y="230" width="260" height="24" rx="4" fill="rgba(6,182,212,0.08)" stroke="rgba(6,182,212,0.3)" stroke-width="1"/>
+    <text x="570" y="246" text-anchor="middle" fill="#06b6d4" font-family="Orbitron" font-size="11">242× FASTER — ZERO ERRORS</text>
+  </svg>
+</div>
+
+<!-- QUIZ 6.1 -->
+<div style="margin-top:32px">
+  <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);margin-bottom:18px;letter-spacing:0.08em">🎯 QUIZ — Section 6.1</div>
+
+  <div class="card" style="margin-bottom:14px" id="q61-1">
+    <div class="quiz-q"><strong>Q1.</strong> A network engineer uses a single script to push the same VLAN configuration to 200 switches simultaneously. Which benefit of automation does this BEST demonstrate?</div>
+    <button class="q-option" onclick="qa(this,'q61-1','w')">A) Improved security posture across the network</button>
+    <button class="q-option" onclick="qa(this,'q61-1','w')">B) Reduced configuration drift over time</button>
+    <button class="q-option" onclick="qa(this,'q61-1','c')">C) Enhanced scalability — one change scales to any number of devices</button>
+    <button class="q-option" onclick="qa(this,'q61-1','w')">D) Better fault tolerance through redundancy</button>
+    <div class="q-exp" id="exp-q61-1">✅ <strong>C is correct.</strong> Scalability — the script runs identically on 200 devices as it would on 2. This demonstrates automation's core scalability benefit: the work of configuring one device is the same work as configuring any number.
+    <br><br>B (Reduced drift) is also a benefit of automation but BEST describes consistency, not the act of pushing to many devices simultaneously. D (fault tolerance) relates to redundancy design, not automation.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q61-2">
+    <div class="quiz-q"><strong>Q2.</strong> Which term describes the condition where network devices gradually differ from their intended configuration state due to undocumented manual changes?</div>
+    <button class="q-option" onclick="qa(this,'q61-2','w')">A) Configuration entropy</button>
+    <button class="q-option" onclick="qa(this,'q61-2','c')">B) Configuration drift</button>
+    <button class="q-option" onclick="qa(this,'q61-2','w')">C) State deviation</button>
+    <button class="q-option" onclick="qa(this,'q61-2','w')">D) Policy mismatch</button>
+    <div class="q-exp" id="exp-q61-2">✅ <strong>B is correct.</strong> Configuration drift is the specific term for devices diverging from intended state over time. It occurs when engineers make "quick fixes" directly on devices without updating the source of truth. Automation prevents drift by continuously enforcing desired state.
+    <br><br>The other options are not standard networking terms used in the CCNA 200-301 exam context.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q61-3">
+    <div class="quiz-q"><strong>Q3.</strong> Which automation technique allows a newly deployed router to boot and automatically download its full configuration without any manual SSH session?</div>
+    <button class="q-option" onclick="qa(this,'q61-3','w')">A) Telemetry streaming</button>
+    <button class="q-option" onclick="qa(this,'q61-3','w')">B) Intent-based networking</button>
+    <button class="q-option" onclick="qa(this,'q61-3','c')">C) Zero-Touch Provisioning (ZTP)</button>
+    <button class="q-option" onclick="qa(this,'q61-3','w')">D) Configuration drift correction</button>
+    <div class="q-exp" id="exp-q61-3">✅ <strong>C is correct.</strong> Zero-Touch Provisioning (ZTP) allows a new device to boot, contact a provisioning server (via DHCP option 67), and automatically download its configuration — no human SSH required. This dramatically speeds up branch deployments.
+    <br><br>Telemetry streaming (A) is about monitoring, not provisioning. Intent-based networking (B) is a broader concept. Drift correction (D) fixes existing devices, not new ones.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q61-4">
+    <div class="quiz-q"><strong>Q4.</strong> What is the primary advantage of storing network configurations in a Git version control system?</div>
+    <button class="q-option" onclick="qa(this,'q61-4','w')">A) Configurations are automatically pushed to all devices</button>
+    <button class="q-option" onclick="qa(this,'q61-4','w')">B) Git encrypts configurations with AES-256</button>
+    <button class="q-option" onclick="qa(this,'q61-4','c')">C) Complete history of who changed what, when, and why — with rollback capability</button>
+    <button class="q-option" onclick="qa(this,'q61-4','w')">D) Git validates JSON and YAML syntax automatically</button>
+    <div class="q-exp" id="exp-q61-4">✅ <strong>C is correct.</strong> Git's primary benefit for network configs is audit trail and rollback. Every commit records: author, timestamp, commit message (the "why"), and exact diff (what changed). If a change breaks something, git revert restores the previous state instantly.
+    <br><br>Git does NOT automatically push configs to devices (A) — that's Ansible/CI-CD. Git doesn't encrypt by default (B). Syntax validation (D) requires separate linting tools.</div>
+  </div>
+</div>
+
+<div class="summary-box">
+  <div class="summary-label">📋 EXAM-READY SUMMARY — 6.1</div>
+  <ul class="summary-list">
+    <li><strong>Configuration drift</strong> = devices diverging from intended state — automation prevents it via continuous enforcement</li>
+    <li><strong>Scale benefit</strong> = 1 engineer + automation tools can manage 1,000+ devices as easily as managing 1</li>
+    <li><strong>Speed</strong> = automation reduces change time from hours/days to minutes/seconds</li>
+    <li><strong>Zero-Touch Provisioning (ZTP)</strong> = new device auto-downloads config on first boot, no manual SSH</li>
+    <li><strong>Version control (Git)</strong> = tracks all config changes with author/timestamp/rollback capability</li>
+  </ul>
+  <div class="callout callout-exam" style="margin-top:12px;font-size:12px">
+    <span class="callout-label">⚠️ TRAP WATCH</span>
+    <span class="callout-text">1) "Automation eliminates the need for network engineers" — FALSE. It changes skills needed, not headcount for design/architecture. 2) Configuration drift is a PROBLEM that automation solves — not a feature. 3) Git stores configs but doesn't push them — Ansible/Terraform push configs.</span>
+  </div>
+</div>
+</section>
+
+
+<!-- ════════════════════════════════════
+     6.2 — TRADITIONAL vs SDN
+════════════════════════════════════ -->
+<section class="section-block" id="s62" data-section="s62">
+<div class="section-eyebrow">TOPIC 6.2</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:26px;color:var(--text);margin-bottom:24px">Traditional Networks vs Controller-Based Networking</h2>
+
+<div class="card card-glow-blue">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--blue);margin-bottom:16px">① Traditional Distributed Architecture — How It Works</h3>
+
+  <p style="color:var(--text-dim);margin-bottom:16px">In traditional networking, every device is completely autonomous. Each router or switch runs its own control plane (routing/switching protocols), manages its own forwarding table, and is configured independently.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:10px">THREE PLANES IN EVERY DEVICE</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.9">
+        <div><strong style="color:var(--blue)">Control Plane:</strong> Makes forwarding decisions (OSPF, STP, BGP, ARP)</div>
+        <div><strong style="color:var(--green)">Data Plane:</strong> Actually forwards packets at hardware speed</div>
+        <div><strong style="color:var(--amber)">Management Plane:</strong> SSH/CLI/SNMP — how you configure it</div>
+        <div style="margin-top:8px;padding:8px;background:rgba(100,116,139,0.1);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim)">In traditional: ALL THREE PLANES run on the SAME device — tightly coupled</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:10px">TRADITIONAL PROBLEMS</div>
+      <div style="font-size:13px;line-height:1.9">
+        <div><span style="color:var(--red)">✗</span> <span style="color:var(--text-dim)">Each device has LIMITED view (only neighbors)</span></div>
+        <div><span style="color:var(--red)">✗</span> <span style="color:var(--text-dim)">Convergence takes time (seconds to minutes)</span></div>
+        <div><span style="color:var(--red)">✗</span> <span style="color:var(--text-dim)">Vendor lock-in (each CLI is different)</span></div>
+        <div><span style="color:var(--red)">✗</span> <span style="color:var(--text-dim)">Per-box configuration (no global view)</span></div>
+        <div><span style="color:var(--red)">✗</span> <span style="color:var(--text-dim)">No intent verification</span></div>
+        <div><span style="color:var(--red)">✗</span> <span style="color:var(--text-dim)">Changes require maintenance windows</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--green);margin:20px 0 14px">Controller-Based Architecture — The SDN Revolution</h3>
+
+  <p style="color:var(--text-dim);margin-bottom:14px">SDN moves the control plane OUT of individual devices and INTO a centralized software controller. Devices become "dumb" forwarding hardware — they just forward packets based on instructions from the controller.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.2);border-radius:6px;padding:14px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--green);font-weight:600;margin-bottom:10px">CONTROL PLANE — Centralized in Controller</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8">
+        <div>• Runs routing/switching logic in SOFTWARE</div>
+        <div>• Has <strong style="color:var(--text)">global network view</strong> (not just neighbors)</div>
+        <div>• Makes all forwarding decisions for ALL devices</div>
+        <div>• Runs on standard x86 servers (or cloud)</div>
+        <div>• Software updates = new network features</div>
+        <div>• Examples: Cisco DNA Center, OpenDaylight, APIC</div>
+      </div>
+    </div>
+    <div style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.2);border-radius:6px;padding:14px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--blue);font-weight:600;margin-bottom:10px">DATA PLANE — Distributed in Hardware</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8">
+        <div>• Physical routers/switches forward packets</div>
+        <div>• Forwarding tables PROGRAMMED by controller</div>
+        <div>• Still forwards at wire speed (ASICs — 100Gbps+)</div>
+        <div>• No local routing decisions</div>
+        <div>• Simple: match packet → action from table</div>
+        <div>• Receives: flow rules, forwarding entries</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-exam" style="margin-top:16px">
+    <span class="callout-label">⚡ Exam Tip</span>
+    <span class="callout-text">The CCNA exam loves to test: "In SDN, which plane is centralized?" → <strong>Control plane</strong>. "Which plane remains distributed?" → <strong>Data plane</strong>. The data plane MUST stay in hardware for wire-speed forwarding performance. If asked where routing decisions are made in SDN: <strong>the controller</strong>.</span>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--amber);margin:20px 0 12px">Cisco Controller-Based Products</h3>
+
+  <table>
+    <tr><th>Product</th><th>Target Network</th><th>Key Capability</th><th>API Type</th></tr>
+    <tr><td style="color:var(--blue)">Cisco DNA Center<br><span style="font-size:10px;font-family:'JetBrains Mono',monospace">(Catalyst Center)</span></td><td>Campus LAN/WLAN</td><td>SD-Access fabric, Intent-based networking, AI Assurance</td><td>REST (Northbound)</td></tr>
+    <tr><td style="color:var(--cyan)">Cisco APIC</td><td>Data Center (ACI)</td><td>Application Policy Infrastructure, Spine-Leaf automation</td><td>REST (Northbound)</td></tr>
+    <tr><td style="color:var(--green)">Cisco vManage</td><td>SD-WAN / Branch</td><td>Zero-touch provisioning, WAN policy management</td><td>REST (Northbound)</td></tr>
+    <tr><td style="color:var(--purple)">Cisco Meraki</td><td>Cloud-Managed</td><td>100% cloud dashboard, no on-prem controller</td><td>Dashboard REST API</td></tr>
+  </table>
+</div>
+
+<!-- INTERACTIVE COMPARISON WIDGET -->
+<div class="widget-panel" style="margin-top:20px">
+  <div class="widget-header">⚡ INTERACTIVE — Traditional vs SDN Comparison</div>
+  <div class="widget-body">
+    <div class="compare-grid">
+      <div class="compare-traditional">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:#64748b;margin-bottom:14px">📡 TRADITIONAL — Distributed Control</div>
+        <svg viewBox="0 0 280 200" style="width:100%;height:auto">
+          <!-- 5 autonomous routers, each with own control plane -->
+          <g id="trad-r1">
+            <rect x="20" y="40" width="50" height="32" rx="4" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+            <text x="45" y="54" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">CP+DP</text>
+            <text x="45" y="64" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="7">R1</text>
+          </g>
+          <g id="trad-r2">
+            <rect x="115" y="20" width="50" height="32" rx="4" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+            <text x="140" y="34" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">CP+DP</text>
+            <text x="140" y="44" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="7">R2</text>
+          </g>
+          <g id="trad-r3">
+            <rect x="210" y="40" width="50" height="32" rx="4" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+            <text x="235" y="54" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">CP+DP</text>
+            <text x="235" y="64" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="7">R3</text>
+          </g>
+          <g id="trad-r4">
+            <rect x="55" y="120" width="50" height="32" rx="4" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+            <text x="80" y="134" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">CP+DP</text>
+            <text x="80" y="144" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="7">R4</text>
+          </g>
+          <g id="trad-r5">
+            <rect x="170" y="120" width="50" height="32" rx="4" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+            <text x="195" y="134" text-anchor="middle" fill="#64748b" font-family="JetBrains Mono" font-size="8">CP+DP</text>
+            <text x="195" y="144" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="7">R5</text>
+          </g>
+          <!-- connections (gossip-style routing) -->
+          <line x1="70" y1="56" x2="115" y2="36" stroke="#334155" stroke-width="1.5"/>
+          <line x1="165" y1="36" x2="210" y2="56" stroke="#334155" stroke-width="1.5"/>
+          <line x1="45" y1="72" x2="70" y2="120" stroke="#334155" stroke-width="1.5"/>
+          <line x1="195" y1="120" x2="235" y2="72" stroke="#334155" stroke-width="1.5"/>
+          <line x1="105" y1="136" x2="170" y2="136" stroke="#334155" stroke-width="1.5"/>
+          <line x1="140" y1="52" x2="115" y2="120" stroke="#334155" stroke-width="1.5"/>
+          <!-- Config badges (SSH to each) -->
+          <rect x="4" y="88" width="55" height="14" rx="2" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="0.5"/>
+          <text x="31" y="98" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="6">SSH 1/5</text>
+          <rect x="56" y="162" width="55" height="14" rx="2" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="0.5"/>
+          <text x="83" y="172" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="6">SSH 2/5</text>
+          <rect x="213" y="88" width="55" height="14" rx="2" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="0.5"/>
+          <text x="240" y="98" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="6">SSH 3/5</text>
+
+          <text x="140" y="190" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono" font-size="8">5 SSH sessions required</text>
+        </svg>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+          <span class="badge badge-red" style="font-size:10px">Human error risk</span>
+          <span class="badge badge-red" style="font-size:10px">No central view</span>
+          <span class="badge badge-red" style="font-size:10px">Config drift</span>
+          <span class="badge badge-red" style="font-size:10px">Hours per change</span>
+        </div>
+      </div>
+
+      <div class="compare-sdn">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--green);margin-bottom:14px">🧠 SDN — Centralized Control</div>
+        <svg viewBox="0 0 280 200" style="width:100%;height:auto">
+          <!-- Central controller -->
+          <rect x="90" y="10" width="100" height="40" rx="5" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+          <text x="140" y="28" text-anchor="middle" fill="#3b82f6" font-family="Orbitron" font-size="9" font-weight="700">CONTROLLER</text>
+          <text x="140" y="42" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="7">Global View + Control Plane</text>
+
+          <!-- 5 dumb forwarding devices -->
+          <rect x="20" y="130" width="40" height="28" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="40" y="148" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">DP R1</text>
+          <rect x="70" y="130" width="40" height="28" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="90" y="148" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">DP R2</text>
+          <rect x="120" y="130" width="40" height="28" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="140" y="148" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">DP R3</text>
+          <rect x="170" y="130" width="40" height="28" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="190" y="148" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">DP R4</text>
+          <rect x="220" y="130" width="40" height="28" rx="3" fill="#0f172a" stroke="#4ade80" stroke-width="1.5"/>
+          <text x="240" y="148" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">DP R5</text>
+
+          <!-- Southbound API arrows from controller to all -->
+          <line x1="110" y1="50" x2="40" y2="130" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-d"/>
+          <line x1="125" y1="50" x2="90" y2="130" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-d" style="animation-delay:.2s"/>
+          <line x1="140" y1="50" x2="140" y2="130" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-d" style="animation-delay:.4s"/>
+          <line x1="155" y1="50" x2="190" y2="130" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-d" style="animation-delay:.2s"/>
+          <line x1="170" y1="50" x2="240" y2="130" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="5,3" class="anim-flow-d" style="animation-delay:.4s"/>
+
+          <text x="140" y="115" text-anchor="middle" fill="#fb923c" font-family="JetBrains Mono" font-size="7">Southbound API — 1 push</text>
+          <text x="140" y="175" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">DP = Data Plane only</text>
+          <text x="140" y="190" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">1 config push → ALL devices</text>
+        </svg>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+          <span class="badge badge-green" style="font-size:10px">Consistent config</span>
+          <span class="badge badge-green" style="font-size:10px">Central visibility</span>
+          <span class="badge badge-green" style="font-size:10px">Policy-driven</span>
+          <span class="badge badge-green" style="font-size:10px">Seconds per change</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz 6.2 -->
+<div style="margin-top:28px">
+  <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);margin-bottom:18px;letter-spacing:0.08em">🎯 QUIZ — Section 6.2</div>
+
+  <div class="card" style="margin-bottom:14px" id="q62-1">
+    <div class="quiz-q"><strong>Q1.</strong> In a traditional network, where does the control plane reside?</div>
+    <button class="q-option" onclick="qa(this,'q62-1','w')">A) Centralized SDN controller appliance</button>
+    <button class="q-option" onclick="qa(this,'q62-1','c')">B) Each individual network device (distributed)</button>
+    <button class="q-option" onclick="qa(this,'q62-1','w')">C) The northbound API layer</button>
+    <button class="q-option" onclick="qa(this,'q62-1','w')">D) A cloud management platform</button>
+    <div class="q-exp" id="exp-q62-1">✅ <strong>B is correct.</strong> In traditional networking, the control plane (routing protocols, STP, ARP processing, forwarding table calculation) runs locally on EACH device. This is the distributed model — each router calculates its own routing table using OSPF/EIGRP/BGP neighbor updates. SDN moved this to a centralized controller.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q62-2">
+    <div class="quiz-q"><strong>Q2.</strong> In an SDN architecture, the data plane remains distributed in network devices. What is the PRIMARY reason for this design decision?</div>
+    <button class="q-option" onclick="qa(this,'q62-2','w')">A) Network devices cannot support NETCONF without local data plane</button>
+    <button class="q-option" onclick="qa(this,'q62-2','w')">B) The controller cannot communicate with devices fast enough</button>
+    <button class="q-option" onclick="qa(this,'q62-2','c')">C) Hardware ASICs in network devices forward packets at wire speed (100Gbps+) — software cannot match this performance</button>
+    <button class="q-option" onclick="qa(this,'q62-2','w')">D) SDN standards require local data plane for redundancy</button>
+    <div class="q-exp" id="exp-q62-2">✅ <strong>C is correct.</strong> ASIC (Application-Specific Integrated Circuit) hardware in routers and switches can forward millions of packets per second at wire speed. Software running on a controller server cannot match this forwarding performance. So the controller handles the intelligence (control plane) while the hardware handles the speed (data plane).</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q62-3">
+    <div class="quiz-q"><strong>Q3.</strong> Which Cisco controller-based product is specifically designed for campus LAN and WLAN management with intent-based networking and AI assurance capabilities?</div>
+    <button class="q-option" onclick="qa(this,'q62-3','w')">A) Cisco vManage</button>
+    <button class="q-option" onclick="qa(this,'q62-3','w')">B) Cisco APIC</button>
+    <button class="q-option" onclick="qa(this,'q62-3','c')">C) Cisco DNA Center (Catalyst Center)</button>
+    <button class="q-option" onclick="qa(this,'q62-3','w')">D) Cisco Meraki</button>
+    <div class="q-exp" id="exp-q62-3">✅ <strong>C is correct.</strong> Cisco DNA Center (now called Catalyst Center) manages campus LAN and WLAN — SD-Access fabric, intent-based networking, AI-driven assurance. APIC (B) is for data center ACI. vManage (A) is for SD-WAN branch routing. Meraki (D) is 100% cloud-managed without a local controller.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q62-4">
+    <div class="quiz-q"><strong>Q4.</strong> A network engineer configures a policy in Cisco DNA Center and it automatically applies to all 300 campus switches. Which SDN benefit does this demonstrate?</div>
+    <button class="q-option" onclick="qa(this,'q62-4','w')">A) Data plane separation</button>
+    <button class="q-option" onclick="qa(this,'q62-4','w')">B) NETCONF southbound communication</button>
+    <button class="q-option" onclick="qa(this,'q62-4','c')">C) Centralized policy enforcement — configure once, apply everywhere</button>
+    <button class="q-option" onclick="qa(this,'q62-4','w')">D) Underlay network routing optimization</button>
+    <div class="q-exp" id="exp-q62-4">✅ <strong>C is correct.</strong> This demonstrates centralized policy enforcement — one of SDN's core benefits. The engineer configures the controller's policy layer once (the intent), and the controller translates that intent into device-specific configurations pushed to all 300 switches. The southbound API (B) is how it communicates but isn't the benefit being described.</div>
+  </div>
+</div>
+
+<div class="summary-box">
+  <div class="summary-label">📋 EXAM-READY SUMMARY — 6.2</div>
+  <ul class="summary-list">
+    <li>Traditional networking: <strong>control plane distributed</strong> (runs on each device — OSPF, STP, etc.)</li>
+    <li>SDN: <strong>control plane centralized</strong> in controller, data plane stays distributed in hardware</li>
+    <li>Data plane stays in hardware because ASICs forward at wire speed that software cannot match</li>
+    <li>Cisco DNA Center = campus SDN controller | APIC = data center | vManage = SD-WAN | Meraki = cloud</li>
+    <li>SDN benefits: single pane of glass, consistent policy, faster changes, intent verification</li>
+  </ul>
+</div>
+</section>
+
+
+<!-- ════════════════════════════════════
+     6.3 — SDN ARCHITECTURE
+════════════════════════════════════ -->
+<section class="section-block" id="s63" data-section="s63">
+<div class="section-eyebrow">TOPIC 6.3</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:26px;color:var(--text);margin-bottom:24px">SDN Architecture — Overlay, Underlay, Fabric</h2>
+
+<div class="card card-glow-purple">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--purple);margin-bottom:16px">① The Three-Tier SDN Architecture</h3>
+
+  <p style="color:var(--text-dim);margin-bottom:20px">SDN organizes network management into three distinct tiers, each with specific roles and APIs connecting them.</p>
+
+  <!-- Three-tier diagram -->
+  <div class="diagram-box" style="margin-bottom:20px">
+    <div class="diagram-titlebar">
+      <div class="dtbar-dot" style="background:#c084fc"></div>
+      <div class="dtbar-dot" style="background:#60a5fa"></div>
+      <div class="dtbar-dot" style="background:#4ade80"></div>
+      &nbsp; ANIMATED — Three-Tier SDN Architecture with API flows
+    </div>
+    <svg viewBox="0 0 780 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;padding:16px">
+
+      <!-- APPLICATION TIER (top) -->
+      <rect x="30" y="20" width="720" height="80" rx="6" fill="rgba(192,132,252,0.07)" stroke="rgba(192,132,252,0.4)" stroke-width="1.5"/>
+      <text x="50" y="42" fill="#c084fc" font-family="Orbitron" font-size="11" font-weight="700">APPLICATION LAYER</text>
+      <text x="50" y="55" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">Network applications consuming APIs — no knowledge of physical topology</text>
+
+      <rect x="50" y="62" width="110" height="26" rx="3" fill="#0f172a" stroke="rgba(192,132,252,0.5)" stroke-width="1"/>
+      <text x="105" y="79" text-anchor="middle" fill="#c084fc" font-family="JetBrains Mono" font-size="8">Traffic Engineering</text>
+
+      <rect x="175" y="62" width="110" height="26" rx="3" fill="#0f172a" stroke="rgba(192,132,252,0.5)" stroke-width="1"/>
+      <text x="230" y="79" text-anchor="middle" fill="#c084fc" font-family="JetBrains Mono" font-size="8">Network Analytics</text>
+
+      <rect x="300" y="62" width="110" height="26" rx="3" fill="#0f172a" stroke="rgba(192,132,252,0.5)" stroke-width="1"/>
+      <text x="355" y="79" text-anchor="middle" fill="#c084fc" font-family="JetBrains Mono" font-size="8">Security Policies</text>
+
+      <rect x="425" y="62" width="110" height="26" rx="3" fill="#0f172a" stroke="rgba(192,132,252,0.5)" stroke-width="1"/>
+      <text x="480" y="79" text-anchor="middle" fill="#c084fc" font-family="JetBrains Mono" font-size="8">Orchestration</text>
+
+      <rect x="550" y="62" width="110" height="26" rx="3" fill="#0f172a" stroke="rgba(192,132,252,0.5)" stroke-width="1"/>
+      <text x="605" y="79" text-anchor="middle" fill="#c084fc" font-family="JetBrains Mono" font-size="8">Business Apps</text>
+
+      <!-- NORTHBOUND API label -->
+      <rect x="290" y="105" width="200" height="28" rx="3" fill="rgba(192,132,252,0.12)" stroke="rgba(192,132,252,0.5)" stroke-width="1.5"/>
+      <text x="390" y="123" text-anchor="middle" fill="#c084fc" font-family="Orbitron" font-size="10" font-weight="700">NORTHBOUND API</text>
+      <!-- Northbound arrows (app → controller) -->
+      <line x1="390" y1="133" x2="390" y2="163" stroke="#c084fc" stroke-width="2" stroke-dasharray="6,3" class="anim-flow-d"/>
+      <polygon points="385,160 395,160 390,170" fill="#c084fc"/>
+
+      <!-- CONTROLLER TIER (middle) -->
+      <rect x="30" y="170" width="720" height="80" rx="6" fill="rgba(59,130,246,0.07)" stroke="rgba(59,130,246,0.4)" stroke-width="1.5"/>
+      <text x="50" y="192" fill="#3b82f6" font-family="Orbitron" font-size="11" font-weight="700">CONTROL LAYER — SDN CONTROLLER</text>
+      <text x="50" y="205" fill="#94a3b8" font-family="JetBrains Mono" font-size="9">Global network view · Routing decisions · Policy enforcement · Network intelligence</text>
+
+      <rect x="90" y="212" width="130" height="26" rx="3" fill="#0f172a" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+      <text x="155" y="229" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="8">Cisco DNA Center</text>
+
+      <rect x="240" y="212" width="130" height="26" rx="3" fill="#0f172a" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+      <text x="305" y="229" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="8">OpenDaylight</text>
+
+      <rect x="390" y="212" width="130" height="26" rx="3" fill="#0f172a" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+      <text x="455" y="229" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="8">Cisco APIC</text>
+
+      <rect x="540" y="212" width="170" height="26" rx="3" fill="#0f172a" stroke="rgba(59,130,246,0.5)" stroke-width="1"/>
+      <text x="625" y="229" text-anchor="middle" fill="#60a5fa" font-family="JetBrains Mono" font-size="8">Cisco vManage / Meraki</text>
+
+      <!-- SOUTHBOUND API label -->
+      <rect x="255" y="255" width="270" height="28" rx="3" fill="rgba(251,146,60,0.12)" stroke="rgba(251,146,60,0.5)" stroke-width="1.5"/>
+      <text x="390" y="273" text-anchor="middle" fill="#fb923c" font-family="Orbitron" font-size="10" font-weight="700">SOUTHBOUND API</text>
+      <text x="390" y="283" text-anchor="middle" fill="#fb923c" font-family="JetBrains Mono" font-size="7">NETCONF · RESTCONF · OpenFlow · gRPC/gNMI</text>
+      <!-- Southbound arrows -->
+      <line x1="200" y1="255" x2="130" y2="290" stroke="#fb923c" stroke-width="2" stroke-dasharray="6,3" class="anim-flow-d" style="animation-delay:.2s"/>
+      <line x1="390" y1="283" x2="390" y2="290" stroke="#fb923c" stroke-width="2" stroke-dasharray="6,3" class="anim-flow-d" style="animation-delay:.4s"/>
+      <line x1="580" y1="255" x2="650" y2="290" stroke="#fb923c" stroke-width="2" stroke-dasharray="6,3" class="anim-flow-d" style="animation-delay:.2s"/>
+
+      <!-- INFRASTRUCTURE TIER (bottom) -->
+      <rect x="30" y="295" width="720" height="52" rx="6" fill="rgba(74,222,128,0.05)" stroke="rgba(74,222,128,0.3)" stroke-width="1.5"/>
+      <text x="50" y="315" fill="#4ade80" font-family="Orbitron" font-size="11" font-weight="700">INFRASTRUCTURE LAYER — DATA PLANE</text>
+      <text x="50" y="328" fill="#94a3b8" font-family="JetBrains Mono" font-size="8">Routers · Switches · APs — forward packets at wire speed based on controller-programmed forwarding tables</text>
+
+      <!-- Device icons bottom -->
+      <rect x="60" y="298" width="36" height="22" rx="2" fill="#0f172a" stroke="rgba(74,222,128,0.5)" stroke-width="1"/>
+      <text x="78" y="313" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">RTR</text>
+      <rect x="106" y="298" width="36" height="22" rx="2" fill="#0f172a" stroke="rgba(74,222,128,0.5)" stroke-width="1"/>
+      <text x="124" y="313" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">SW</text>
+      <rect x="152" y="298" width="36" height="22" rx="2" fill="#0f172a" stroke="rgba(74,222,128,0.5)" stroke-width="1"/>
+      <text x="170" y="313" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">SW</text>
+      <rect x="198" y="298" width="36" height="22" rx="2" fill="#0f172a" stroke="rgba(74,222,128,0.5)" stroke-width="1"/>
+      <text x="216" y="313" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">RTR</text>
+      <rect x="244" y="298" width="36" height="22" rx="2" fill="#0f172a" stroke="rgba(74,222,128,0.5)" stroke-width="1"/>
+      <text x="262" y="313" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">AP</text>
+      <rect x="290" y="298" width="36" height="22" rx="2" fill="#0f172a" stroke="rgba(74,222,128,0.5)" stroke-width="1"/>
+      <text x="308" y="313" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="7">FW</text>
+      <text x="550" y="320" text-anchor="middle" fill="#4ade80" font-family="JetBrains Mono" font-size="8">... 1000s of devices ...</text>
+    </svg>
+  </div>
+
+  <!-- 6.3.a Control/Data Plane separation -->
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--blue);margin:20px 0 12px">6.3.a — Separation of Control Plane and Data Plane</h3>
+
+  <table style="margin-bottom:16px">
+    <tr><th>Plane</th><th>Traditional Location</th><th>SDN Location</th><th>Function</th><th>Speed</th></tr>
+    <tr>
+      <td style="color:var(--blue)">Control Plane</td>
+      <td>Each network device</td>
+      <td style="color:var(--green)">SDN Controller</td>
+      <td>Routing decisions, OSPF/STP, forwarding table calc</td>
+      <td>Software speed (OK for decisions)</td>
+    </tr>
+    <tr>
+      <td style="color:var(--green)">Data Plane</td>
+      <td>Each network device</td>
+      <td style="color:var(--green)">Still in devices (hardware)</td>
+      <td>Actual packet forwarding, match-action lookup</td>
+      <td>ASIC hardware speed (100Gbps+)</td>
+    </tr>
+    <tr>
+      <td style="color:var(--amber)">Management Plane</td>
+      <td>Each device (SSH/CLI)</td>
+      <td style="color:var(--green)">Controller GUI + API</td>
+      <td>Configuration, monitoring, troubleshooting</td>
+      <td>Human/API speed</td>
+    </tr>
+  </table>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--cyan);margin-bottom:10px;font-weight:600">NETCONF (RFC 6241)</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:10px">Network Configuration Protocol. Uses XML data encoding over SSH (port 830). Supports transaction-based config with commit/rollback.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="lang-label">NETCONF XML</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+        <pre class="code-body"><span class="j-comment">&lt;!-- Get running config --&gt;</span>
+&lt;<span class="j-key">rpc</span> <span class="j-bool">message-id</span>="101"&gt;
+  &lt;<span class="j-key">get-config</span>&gt;
+    &lt;<span class="j-key">source</span>&gt;
+      &lt;<span class="j-str">running</span>/&gt;
+    &lt;/<span class="j-key">source</span>&gt;
+  &lt;/<span class="j-key">get-config</span>&gt;
+&lt;/<span class="j-key">rpc</span>&gt;</pre>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--cyan);margin-bottom:10px;font-weight:600">RESTCONF (RFC 8040)</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:10px">REST-based interface to YANG data models. HTTPS (port 443). Returns JSON or XML. More developer-friendly than NETCONF.</div>
+      <div class="code-block">
+        <div class="code-header"><span class="lang-label">RESTCONF + Python</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+        <pre class="code-body"><span class="p-comment"># GET all interfaces via RESTCONF</span>
+url = <span class="p-str">"https://device/restconf/data/"</span>
+      <span class="p-str">"ietf-interfaces:interfaces"</span>
+headers = {
+    <span class="j-key">"Accept"</span>: <span class="j-str">"application/yang-data+json"</span>,
+    <span class="j-key">"Authorization"</span>: <span class="j-str">"Basic ..."</span>
+}
+<span class="p-fn">response</span> = requests.get(url, headers=headers)</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6.3.b Northbound / Southbound APIs -->
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--orange);margin:20px 0 12px">6.3.b — Northbound and Southbound APIs</h3>
+
+  <table style="margin-bottom:16px">
+    <tr><th>API Direction</th><th>Between</th><th>Used By</th><th>Style</th><th>Protocols</th></tr>
+    <tr>
+      <td><span style="color:var(--purple)">⬆ NORTHBOUND</span></td>
+      <td>Controller → Applications</td>
+      <td>Network apps, scripts, business systems</td>
+      <td>Abstracted, intent-based</td>
+      <td>REST, RESTCONF, GraphQL, gRPC, Python SDK</td>
+    </tr>
+    <tr>
+      <td><span style="color:var(--orange)">⬇ SOUTHBOUND</span></td>
+      <td>Controller → Devices</td>
+      <td>SDN controller only</td>
+      <td>Device-specific, operational</td>
+      <td>OpenFlow, NETCONF, RESTCONF, gRPC/gNMI, CLI/SSH</td>
+    </tr>
+  </table>
+
+  <div class="callout callout-memo">
+    <span class="callout-label">📌 Memorize</span>
+    <span class="callout-text"><strong>Northbound = UP = REST = Applications talk to Controller.</strong> "North" = above the controller = application layer.<br>
+    <strong>Southbound = DOWN = NETCONF/OpenFlow = Controller talks to Devices.</strong> "South" = below the controller = infrastructure layer.<br>
+    Memory trick: "North is for Networking Apps, South is for Switches."</span>
+  </div>
+
+  <!-- Underlay / Overlay / Fabric -->
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--cyan);margin:20px 0 12px">Underlay vs Overlay vs Fabric</h3>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="card" style="background:var(--bg-elevated);padding:16px;border-top:2px solid var(--cyan)">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);margin-bottom:10px">UNDERLAY</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8">
+        <div><strong style="color:var(--text)">Physical infrastructure:</strong></div>
+        <div>• Real cables, routers, switches</div>
+        <div>• Physical IP connectivity</div>
+        <div>• Traditional protocols: OSPF, BGP</div>
+        <div>• Simple, stable, loop-free</div>
+        <div>• Often: <strong>spine-leaf topology</strong></div>
+        <div>• Role: IP transport for overlay tunnels</div>
+        <div style="margin-top:8px;color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:10px">10.0.0.0/8 loopbacks + OSPF</div>
+      </div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:16px;border-top:2px solid var(--orange)">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--orange);margin-bottom:10px">OVERLAY</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8">
+        <div><strong style="color:var(--text)">Virtual network ON TOP of underlay:</strong></div>
+        <div>• Uses encapsulation tunnels</div>
+        <div>• <strong>VXLAN</strong>: L2 over UDP, 24-bit VNI</div>
+        <div>• GRE, MPLS, IPsec tunnels</div>
+        <div>• Creates logical topology</div>
+        <div>• Independent of physical path</div>
+        <div>• 16 million segments (vs VLAN's 4094)</div>
+        <div style="margin-top:8px;color:var(--orange);font-family:'JetBrains Mono',monospace;font-size:10px">VXLAN UDP port 4789</div>
+      </div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:16px;border-top:2px solid var(--violet)">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--violet);margin-bottom:10px">FABRIC</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8">
+        <div><strong style="color:var(--text)">Underlay + Overlay + Controller:</strong></div>
+        <div>• Managed as ONE unified system</div>
+        <div>• Controller provisions both layers</div>
+        <div>• Single policy model</div>
+        <div><strong>Cisco SD-Access:</strong></div>
+        <div>• Underlay: OSPF + IP</div>
+        <div>• Overlay: VXLAN + LISP</div>
+        <div>• Controller: DNA Center</div>
+        <div style="margin-top:8px;color:var(--violet);font-family:'JetBrains Mono',monospace;font-size:10px">Policy travels with user (SGT)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-exam">
+    <span class="callout-label">⚡ Exam Tip</span>
+    <span class="callout-text">CCNA commonly tests: underlay = physical IP network (OSPF running between switches). Overlay = virtual tunnels on top (VXLAN). Fabric = the complete managed system (underlay + overlay + controller). <strong>VXLAN uses UDP port 4789</strong> and supports 24-bit VNI (16 million segments vs VLAN's 4094).</span>
+  </div>
+</div>
+
+<!-- Quiz 6.3 -->
+<div style="margin-top:28px">
+  <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);margin-bottom:18px;letter-spacing:0.08em">🎯 QUIZ — Section 6.3</div>
+
+  <div class="card" style="margin-bottom:14px" id="q63-1">
+    <div class="quiz-q"><strong>Q1.</strong> Which SDN API type allows applications (such as traffic engineering apps) to communicate with the SDN controller?</div>
+    <button class="q-option" onclick="qa(this,'q63-1','w')">A) Southbound API</button>
+    <button class="q-option" onclick="qa(this,'q63-1','w')">B) Eastbound API</button>
+    <button class="q-option" onclick="qa(this,'q63-1','c')">C) Northbound API</button>
+    <button class="q-option" onclick="qa(this,'q63-1','w')">D) Westbound API</button>
+    <div class="q-exp" id="exp-q63-1">✅ <strong>C is correct.</strong> Northbound APIs sit ABOVE the controller — they expose the controller's capabilities to application-layer systems (traffic engineering, security policy managers, network analytics, custom scripts). Direction: applications → controller = northbound (up). Southbound (A) = controller → devices. Eastbound/Westbound are not standard CCNA terms.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q63-2">
+    <div class="quiz-q"><strong>Q2.</strong> Which protocol is commonly used as a southbound API between an SDN controller and network infrastructure devices, using XML over SSH on port 830?</div>
+    <button class="q-option" onclick="qa(this,'q63-2','w')">A) REST</button>
+    <button class="q-option" onclick="qa(this,'q63-2','c')">B) NETCONF</button>
+    <button class="q-option" onclick="qa(this,'q63-2','w')">C) SNMP</button>
+    <button class="q-option" onclick="qa(this,'q63-2','w')">D) Telnet</button>
+    <div class="q-exp" id="exp-q63-2">✅ <strong>B is correct.</strong> NETCONF (RFC 6241) uses XML data encoding and runs over SSH on port 830. It's a primary southbound API for SDN controllers to configure network devices. RESTCONF is REST-based and uses port 443. REST (A) is the northbound API style. SNMP is a monitoring protocol, not configuration. Telnet is unencrypted legacy.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q63-3">
+    <div class="quiz-q"><strong>Q3.</strong> In SD-Access, which component represents the virtual network (VXLAN tunnels) built on top of the physical IP infrastructure?</div>
+    <button class="q-option" onclick="qa(this,'q63-3','w')">A) Underlay</button>
+    <button class="q-option" onclick="qa(this,'q63-3','w')">B) Fabric</button>
+    <button class="q-option" onclick="qa(this,'q63-3','c')">C) Overlay</button>
+    <button class="q-option" onclick="qa(this,'q63-3','w')">D) Substrate</button>
+    <div class="q-exp" id="exp-q63-3">✅ <strong>C is correct.</strong> The overlay is the virtual network — VXLAN tunnels that carry logical traffic on top of the physical IP underlay. The underlay (A) is the physical IP network (OSPF between switches). The fabric (B) is the complete managed system (underlay + overlay + controller together). "Substrate" is not a standard term.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q63-4">
+    <div class="quiz-q"><strong>Q4.</strong> VXLAN is used as an overlay encapsulation in SD-Access. What UDP port does VXLAN use, and what is its maximum number of network segments?</div>
+    <button class="q-option" onclick="qa(this,'q63-4','w')">A) UDP 4789, 4,094 segments</button>
+    <button class="q-option" onclick="qa(this,'q63-4','w')">B) UDP 8080, 65,535 segments</button>
+    <button class="q-option" onclick="qa(this,'q63-4','c')">C) UDP 4789, ~16 million segments (24-bit VNI)</button>
+    <button class="q-option" onclick="qa(this,'q63-4','w')">D) UDP 830, ~16 million segments</button>
+    <div class="q-exp" id="exp-q63-4">✅ <strong>C is correct.</strong> VXLAN uses UDP port 4789. Its 24-bit VNI (VXLAN Network Identifier) field provides 2^24 = 16,777,216 unique segments — solving VLAN's limitation of only 4,094 (12-bit VLAN ID). Port 830 (D) is NETCONF, not VXLAN.</div>
+  </div>
+</div>
+
+<div class="summary-box">
+  <div class="summary-label">📋 EXAM-READY SUMMARY — 6.3</div>
+  <ul class="summary-list">
+    <li><strong>Northbound API</strong>: applications → controller (REST/RESTCONF) — what app developers use</li>
+    <li><strong>Southbound API</strong>: controller → devices (NETCONF port 830, RESTCONF port 443, OpenFlow) — what the controller uses</li>
+    <li><strong>Underlay</strong>: physical IP network (OSPF, BGP) | <strong>Overlay</strong>: virtual tunnels (VXLAN UDP 4789) | <strong>Fabric</strong>: both managed together</li>
+    <li><strong>NETCONF</strong>: XML, SSH port 830, RFC 6241 | <strong>RESTCONF</strong>: JSON/XML, HTTPS port 443, RFC 8040</li>
+    <li><strong>VXLAN</strong>: 24-bit VNI = 16 million segments (vs VLAN's 4,094) — encapsulates L2 in UDP</li>
+  </ul>
+</div>
+</section>
+
+<!-- ════════════════════════════════════
+     6.4 — AI AND MACHINE LEARNING
+════════════════════════════════════ -->
+<section class="section-block" id="s64" data-section="s64">
+<div class="section-eyebrow">TOPIC 6.4</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:26px;color:var(--text);margin-bottom:24px">AI &amp; Machine Learning in Network Operations</h2>
+
+<div class="card card-glow-purple">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--violet);margin-bottom:16px">① The AI Hierarchy — AI vs ML vs Deep Learning</h3>
+  <p style="color:var(--text-dim);margin-bottom:18px">These three terms are related but distinct. Every CCNA exam question about "AI in networking" maps to one of these categories.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+    <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.25);border-radius:6px;padding:16px;text-align:center">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--violet);margin-bottom:8px">ARTIFICIAL INTELLIGENCE</div>
+      <div style="font-size:32px;margin-bottom:8px">🤖</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.7">Broadest term. Any technique that makes machines appear intelligent — including rule-based systems, ML, and deep learning.</div>
+    </div>
+    <div style="background:rgba(96,165,250,0.06);border:1px solid rgba(96,165,250,0.25);border-radius:6px;padding:16px;text-align:center">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--blue);margin-bottom:8px">MACHINE LEARNING (ML)</div>
+      <div style="font-size:32px;margin-bottom:8px">📊</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.7">Subset of AI. Systems that <strong style="color:var(--text)">learn from data</strong> — no explicit rules programmed. Show data, system finds patterns itself.</div>
+    </div>
+    <div style="background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.25);border-radius:6px;padding:16px;text-align:center">
+      <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--purple);margin-bottom:8px">DEEP LEARNING</div>
+      <div style="font-size:32px;margin-bottom:8px">🧠</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.7">Subset of ML. Neural networks with many layers. Excellent for complex patterns: traffic classification, threat detection.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--blue);margin:20px 0 12px">Predictive AI — Forecasting Problems Before They Happen</h3>
+  <p style="color:var(--text-dim);font-size:13.5px;margin-bottom:14px">Predictive AI analyzes <strong style="color:var(--text)">historical data</strong> to forecast future states — proactively identifying problems before users are impacted. This is what traditional threshold-based alerts cannot do.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--blue);font-weight:600;margin-bottom:10px">PREDICTIVE USE CASES</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.9">
+        <div><strong style="color:var(--text)">Capacity planning:</strong> analyze traffic growth → predict link saturation date → order hardware before needed</div>
+        <div><strong style="color:var(--text)">Failure prediction:</strong> monitor error rates, temperature, power, CPU trends → alert 2 weeks before hardware fails</div>
+        <div><strong style="color:var(--text)">Proactive congestion:</strong> detect pattern before congestion → re-route traffic before users notice</div>
+        <div><strong style="color:var(--text)">Security:</strong> baseline behavior → detect C2 malware communication early, before data exfiltration</div>
+      </div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--violet);font-weight:600;margin-bottom:10px">ML WORKFLOW — 5 STEPS</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:2">
+        <div><span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">1.</span> <strong style="color:var(--text)">COLLECT</strong> — SNMP, streaming telemetry, NetFlow, syslogs</div>
+        <div><span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">2.</span> <strong style="color:var(--text)">PROCESS</strong> — clean, normalize, timestamp, feature engineering</div>
+        <div><span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">3.</span> <strong style="color:var(--text)">TRAIN</strong> — feed historical data → model learns "normal"</div>
+        <div><span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">4.</span> <strong style="color:var(--text)">INFER</strong> — new data → model predicts → anomaly score</div>
+        <div><span style="color:var(--cyan);font-family:'JetBrains Mono',monospace">5.</span> <strong style="color:var(--text)">ACT</strong> — high confidence → automated response or alert</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--purple);margin:20px 0 12px">Generative AI — Creating New Content from Prompts</h3>
+  <p style="color:var(--text-dim);font-size:13.5px;margin-bottom:14px">Generative AI creates <strong style="color:var(--text)">new content</strong> based on natural language prompts. This is different from prediction — it generates configurations, explanations, and documentation on demand.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="card" style="background:var(--bg-elevated);padding:16px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--purple);font-weight:600;margin-bottom:10px">GENERATIVE AI USE CASES</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.9">
+        <div><strong style="color:var(--text)">NL → Config:</strong> "Configure OSPF area 0 on R1" → complete, correct IOS config generated instantly</div>
+        <div><strong style="color:var(--text)">Syslog explanation:</strong> paste error message → AI explains what happened + fix steps</div>
+        <div><strong style="color:var(--text)">Documentation:</strong> analyze running-config → auto-generate network documentation</div>
+        <div><strong style="color:var(--text)">Change risk:</strong> "Will this ACL break anything?" → AI analyzes dependencies</div>
+      </div>
+    </div>
+    <div>
+      <!-- Gen AI demo widget -->
+      <div class="widget-panel" style="margin:0">
+        <div class="widget-header">⚡ DEMO — Generative AI Config Output</div>
+        <div class="widget-body" style="padding:14px">
+          <select id="genai-prompt" class="inp" style="width:100%;margin-bottom:8px;font-size:11px">
+            <option value="ospf">Configure OSPF area 0 on R1 (10.0.0.0/8)</option>
+            <option value="vlan">Create VLAN 10 named Sales on SW1</option>
+            <option value="syslog">Explain: %OSPF-5-ADJCHG Process 1 Nbr 2.2.2.2 FULL to DOWN</option>
+          </select>
+          <button class="btn btn-purple" onclick="runGenAI()" style="width:100%;justify-content:center;margin-bottom:10px">✨ Generate Config</button>
+          <div id="genai-output" class="ansible-terminal" style="min-height:110px;font-size:11px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table style="margin-bottom:14px">
+    <tr><th>Feature</th><th style="color:var(--blue)">Predictive AI/ML</th><th style="color:var(--purple)">Generative AI</th></tr>
+    <tr><td>What it does</td><td style="color:var(--blue)">Forecasts future states from historical data</td><td style="color:var(--purple)">Generates new content from a prompt</td></tr>
+    <tr><td>Input</td><td>Historical metrics, telemetry, logs</td><td style="color:var(--purple)">Natural language text</td></tr>
+    <tr><td>Output</td><td style="color:var(--blue)">Prediction, anomaly score, alert</td><td style="color:var(--purple)">Generated config, explanation, code</td></tr>
+    <tr><td>Cisco example</td><td style="color:var(--blue)">DNA Center Assurance health scores</td><td style="color:var(--purple)">Cisco AI Assistant, CoPilot</td></tr>
+  </table>
+
+  <div class="callout callout-exam">
+    <span class="callout-label">⚡ Exam Tip — The #1 AI Question</span>
+    <span class="callout-text">If the exam says "forecast future link saturation" or "proactive anomaly detection" → <strong>Predictive AI</strong>. If it says "engineer types natural language and receives IOS config" → <strong>Generative AI</strong>. These are different capabilities with different inputs and outputs.</span>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--cyan);margin:20px 0 12px">Cisco AI Implementations</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+    <div class="card" style="background:var(--bg-elevated);padding:14px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--cyan);font-weight:600;margin-bottom:6px">DNA Center Assurance</div>
+      <div style="font-size:12px;color:var(--text-dim)">ML models trained on Cisco's global customer telemetry. Provides 0–100 health scores for network, devices, and clients. Detects anomalies beyond simple thresholds.</div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:14px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--blue);font-weight:600;margin-bottom:6px">Cisco ThousandEyes</div>
+      <div style="font-size:12px;color:var(--text-dim)">Internet and application performance monitoring. ML distinguishes ISP issue vs application bug vs DNS failure. Proactive alerting before users complain.</div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:14px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--red);font-weight:600;margin-bottom:6px">Cisco Stealthwatch</div>
+      <div style="font-size:12px;color:var(--text-dim)">ML-based traffic analysis. Establishes behavioral baseline. Detects insider threats, malware C2, data exfiltration by identifying deviations from normal.</div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:14px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--purple);font-weight:600;margin-bottom:6px">Cisco AI Assistant</div>
+      <div style="font-size:12px;color:var(--text-dim)">Natural language interface in DNA Center. Chat queries: "Show all devices with CPU &gt;80% last hour." Generative AI config and troubleshooting features.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz 6.4 -->
+<div style="margin-top:28px">
+  <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);margin-bottom:18px;letter-spacing:0.08em">🎯 QUIZ — Section 6.4</div>
+
+  <div class="card" style="margin-bottom:14px" id="q64-1">
+    <div class="quiz-q"><strong>Q1.</strong> Which type of AI analyzes historical network performance data to forecast future link saturation BEFORE it occurs?</div>
+    <button class="q-option" onclick="qa(this,'q64-1','w')">A) Generative AI</button>
+    <button class="q-option" onclick="qa(this,'q64-1','c')">B) Predictive AI</button>
+    <button class="q-option" onclick="qa(this,'q64-1','w')">C) Reactive AI</button>
+    <button class="q-option" onclick="qa(this,'q64-1','w')">D) Descriptive AI</button>
+    <div class="q-exp" id="exp-q64-1">✅ <strong>B is correct.</strong> Predictive AI uses historical data patterns to forecast future states proactively. Predicting link saturation before it occurs is the textbook use case. Generative AI (A) creates new content from prompts. "Reactive" and "Descriptive" AI are not standard CCNA terms.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q64-2">
+    <div class="quiz-q"><strong>Q2.</strong> A network engineer types "Configure OSPF area 0 on R1 and advertise the LAN subnet" and receives a complete IOS configuration as output. Which AI capability does this represent?</div>
+    <button class="q-option" onclick="qa(this,'q64-2','w')">A) Predictive ML — analyzing historical patterns</button>
+    <button class="q-option" onclick="qa(this,'q64-2','w')">B) Supervised learning — classification task</button>
+    <button class="q-option" onclick="qa(this,'q64-2','c')">C) Generative AI — creating new content from natural language</button>
+    <button class="q-option" onclick="qa(this,'q64-2','w')">D) Reinforcement learning — reward-based optimization</button>
+    <div class="q-exp" id="exp-q64-2">✅ <strong>C is correct.</strong> Generative AI generates new content (here, IOS configuration) from natural language input. This is what Cisco's AI Assistant and CoPilot features do. Predictive AI (A) forecasts future states from historical data — it does not generate configurations on demand.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q64-3">
+    <div class="quiz-q"><strong>Q3.</strong> In the ML workflow for network operations, what is the correct sequence of the five steps?</div>
+    <button class="q-option" onclick="qa(this,'q64-3','w')">A) Train → Collect → Process → Infer → Act</button>
+    <button class="q-option" onclick="qa(this,'q64-3','c')">B) Collect → Process → Train → Infer → Closed-loop action</button>
+    <button class="q-option" onclick="qa(this,'q64-3','w')">C) Infer → Train → Collect → Process → Act</button>
+    <button class="q-option" onclick="qa(this,'q64-3','w')">D) Collect → Train → Process → Act → Infer</button>
+    <div class="q-exp" id="exp-q64-3">✅ <strong>B is correct.</strong> The workflow must start with data collection from devices (telemetry/SNMP), then process/clean the data, then train the model on historical data, then run inference on new data arriving in real-time, and finally take automated action when confidence is high. You cannot train before collecting and processing data.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q64-4">
+    <div class="quiz-q"><strong>Q4.</strong> Cisco DNA Center Assurance provides 0–100 health scores for network devices. Which technology enables this capability?</div>
+    <button class="q-option" onclick="qa(this,'q64-4','w')">A) Generative AI creating health report documents</button>
+    <button class="q-option" onclick="qa(this,'q64-4','c')">B) Predictive ML analyzing streaming telemetry to detect anomalies beyond simple thresholds</button>
+    <button class="q-option" onclick="qa(this,'q64-4','w')">C) Static rule-based threshold alerts only</button>
+    <button class="q-option" onclick="qa(this,'q64-4','w')">D) OpenFlow southbound API health polling</button>
+    <div class="q-exp" id="exp-q64-4">✅ <strong>B is correct.</strong> DNA Center Assurance uses ML models trained on Cisco's global customer telemetry to calculate 0–100 health scores. It identifies anomalies that go beyond simple threshold violations — ML recognizes unusual patterns even when individual metrics appear normal. Generative AI (A) generates content, not health scores.</div>
+  </div>
+</div>
+
+<div class="summary-box">
+  <div class="summary-label">📋 EXAM-READY SUMMARY — 6.4</div>
+  <ul class="summary-list">
+    <li><strong>Predictive AI/ML</strong>: analyzes historical data → forecasts future problems → proactive, before users are impacted</li>
+    <li><strong>Generative AI</strong>: generates new content (config, explanations, docs) from natural language prompts</li>
+    <li>ML workflow: Collect → Process → Train → Infer → Closed-loop action</li>
+    <li>Cisco DNA Center Assurance: ML health scores (0–100) via telemetry analysis | Stealthwatch: ML threat detection</li>
+    <li>Key exam distinction: <strong>Predictive = forecast future states</strong> | <strong>Generative = create new content</strong></li>
+  </ul>
+</div>
+</section>
+
+<!-- ════════════════════════════════════
+     6.5 — REST APIs
+════════════════════════════════════ -->
+<section class="section-block" id="s65" data-section="s65">
+<div class="section-eyebrow">TOPIC 6.5</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:26px;color:var(--text);margin-bottom:24px">REST-Based APIs — Authentication, CRUD, HTTP Verbs &amp; Data Encoding</h2>
+
+<div class="card card-glow-cyan">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--cyan);margin-bottom:16px">① REST — Architecture Style, Not a Protocol</h3>
+  <p style="color:var(--text-dim);margin-bottom:16px">REST (Representational State Transfer) is an architectural <em>style</em> for building APIs on top of HTTP/HTTPS. It defines constraints that make APIs predictable, scalable, and interoperable. Every modern network controller — Cisco DNA Center, Meraki, APIC — exposes a REST API.</p>
+
+  <div style="background:#000;border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:18px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2.2">
+    <div style="color:var(--text-dim);margin-bottom:6px"># REST URL anatomy — always know these components:</div>
+    <div>
+      <span style="color:var(--cyan)">https://</span><span style="color:var(--green)">sandboxdnac.cisco.com</span><span style="color:var(--amber)">/dna/intent</span><span style="color:var(--blue)">/api/v1</span><span style="color:var(--purple)">/network-device</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:6px;font-size:10px">
+      <div style="color:var(--cyan)">Protocol HTTPS</div>
+      <div style="color:var(--green)">Hostname (controller)</div>
+      <div style="color:var(--amber)">Base path</div>
+      <div style="color:var(--blue)">API version</div>
+      <div style="color:var(--purple)">Resource endpoint</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--amber);margin:0 0 12px">HTTP Verbs — All Five, Memorize Everything</h3>
+
+  <table style="margin-bottom:16px">
+    <tr><th>Verb</th><th>Purpose</th><th>Body?</th><th>Idempotent?</th><th>CRUD</th><th>Success Code</th></tr>
+    <tr>
+      <td><span class="badge http-get">GET</span></td>
+      <td>READ / retrieve data</td>
+      <td style="color:var(--text-dim)">None</td>
+      <td style="color:var(--green)">YES ✓</td>
+      <td style="color:var(--green)">Read</td>
+      <td>200 OK</td>
+    </tr>
+    <tr>
+      <td><span class="badge http-post">POST</span></td>
+      <td>CREATE new resource</td>
+      <td>JSON payload</td>
+      <td style="color:var(--red)">NO ✗</td>
+      <td style="color:var(--blue)">Create</td>
+      <td>201 Created</td>
+    </tr>
+    <tr>
+      <td><span class="badge http-put">PUT</span></td>
+      <td>REPLACE entire resource</td>
+      <td>Full replacement JSON</td>
+      <td style="color:var(--green)">YES ✓</td>
+      <td style="color:var(--amber)">Update</td>
+      <td>200 / 204</td>
+    </tr>
+    <tr>
+      <td><span class="badge http-patch">PATCH</span></td>
+      <td>UPDATE partial fields only</td>
+      <td>Changed fields only</td>
+      <td style="color:var(--orange)">NOT guaranteed</td>
+      <td style="color:var(--orange)">Update</td>
+      <td>200 OK</td>
+    </tr>
+    <tr>
+      <td><span class="badge http-delete">DELETE</span></td>
+      <td>REMOVE a resource</td>
+      <td style="color:var(--text-dim)">Usually none</td>
+      <td style="color:var(--green)">YES ✓</td>
+      <td style="color:var(--red)">Delete</td>
+      <td>204 No Content</td>
+    </tr>
+  </table>
+
+  <div class="callout callout-memo">
+    <span class="callout-label">📌 Memorize — CRUD Mapping</span>
+    <span class="callout-text">
+      <strong>C</strong>reate → POST → 201 &nbsp;|&nbsp; <strong>R</strong>ead → GET → 200 &nbsp;|&nbsp; <strong>U</strong>pdate → PUT (all fields) or PATCH (partial) → 200/204 &nbsp;|&nbsp; <strong>D</strong>elete → DELETE → 204
+      <br><strong>POST is the ONLY non-idempotent verb.</strong> Each POST creates another new resource. Run PUT twice → same result. Run POST twice → two resources created.
+    </span>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--blue);margin:20px 0 12px">HTTP Status Codes — API Responses</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+    <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.25);border-radius:6px;padding:14px">
+      <div style="font-family:'Orbitron',monospace;font-size:10px;color:#22c55e;margin-bottom:8px">2xx — SUCCESS</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:2;font-family:'JetBrains Mono',monospace">
+        <div><span style="color:#22c55e">200</span> OK — success + body</div>
+        <div><span style="color:#22c55e">201</span> Created — POST success</div>
+        <div><span style="color:#22c55e">204</span> No Content — DELETE/PUT</div>
+      </div>
+    </div>
+    <div style="background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.25);border-radius:6px;padding:14px">
+      <div style="font-family:'Orbitron',monospace;font-size:10px;color:var(--orange);margin-bottom:8px">4xx — CLIENT ERROR</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:2;font-family:'JetBrains Mono',monospace">
+        <div><span style="color:var(--orange)">400</span> Bad Request</div>
+        <div><span style="color:var(--orange)">401</span> Unauthorized ← AUTH FAILED</div>
+        <div><span style="color:var(--orange)">403</span> Forbidden ← AUTH OK, NO PERM</div>
+        <div><span style="color:var(--orange)">404</span> Not Found</div>
+        <div><span style="color:var(--orange)">429</span> Rate Limited</div>
+      </div>
+    </div>
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:6px;padding:14px">
+      <div style="font-family:'Orbitron',monospace;font-size:10px;color:var(--red);margin-bottom:8px">5xx — SERVER ERROR</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:2;font-family:'JetBrains Mono',monospace">
+        <div><span style="color:var(--red)">500</span> Internal Server Error</div>
+        <div><span style="color:var(--red)">503</span> Service Unavailable</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-exam">
+    <span class="callout-label">⚡ Exam Trap — 401 vs 403</span>
+    <span class="callout-text"><strong>401 Unauthorized</strong> = authentication failed — you have no valid token or credentials. Fix: provide correct credentials or renew token. <strong>403 Forbidden</strong> = you ARE authenticated, but not authorized for this resource. Fix: check permissions/role. The exam tests this distinction.</span>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--purple);margin:20px 0 12px">Authentication Types — Know All Four for the Exam</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="card" style="background:var(--bg-elevated);padding:16px;border-top:2px solid var(--cyan)">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--cyan);font-weight:600;margin-bottom:8px">Basic Authentication</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-bottom:10px">Username:password Base64-encoded. Sent in Authorization header with <strong style="color:var(--text)">every request</strong>. Simple but requires HTTPS — Base64 is NOT encryption.</div>
+      <div class="code-block" style="margin:0"><pre class="code-body" style="padding:10px;font-size:11px"><span class="j-comment"># Header sent with EVERY request:</span>
+<span class="j-key">Authorization</span>: <span class="j-str">Basic YWRtaW46Q2lzY28xMjM=</span>
+<span class="j-comment"># Decoded: admin:Cisco123 (not encrypted!)</span></pre></div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:16px;border-top:2px solid var(--amber)">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--amber);font-weight:600;margin-bottom:8px">Token / Bearer (Most Common)</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-bottom:10px">POST credentials once → receive token → use token for all requests. <strong style="color:var(--text)">Cisco DNA Center: X-Auth-Token header.</strong></div>
+      <div class="code-block" style="margin:0"><pre class="code-body" style="padding:10px;font-size:11px"><span class="j-comment"># Step 1: POST → get token</span>
+POST /dna/system/api/v1/auth/token
+<span class="j-comment"># Step 2: Use token in all calls</span>
+<span class="j-key">X-Auth-Token</span>: <span class="j-str">eyJhbGciOiJSUzI1Ni...</span></pre></div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:16px;border-top:2px solid var(--green)">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--green);font-weight:600;margin-bottom:8px">API Key</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8;margin-bottom:10px">Static key string issued per application. Sent as query parameter or header. Used by <strong style="color:var(--text)">Cisco Meraki Dashboard API</strong>.</div>
+      <div class="code-block" style="margin:0"><pre class="code-body" style="padding:10px;font-size:11px"><span class="j-comment"># As query parameter:</span>
+GET /api/v1/devices?<span class="j-key">api_key</span>=<span class="j-str">ABC123xyz</span>
+<span class="j-comment"># Or as header:</span>
+<span class="j-key">X-Cisco-Meraki-API-Key</span>: <span class="j-str">ABC123xyz</span></pre></div>
+    </div>
+    <div class="card" style="background:var(--bg-elevated);padding:16px;border-top:2px solid var(--violet)">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--violet);font-weight:600;margin-bottom:8px">OAuth 2.0</div>
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.8">Authorization framework for <strong style="color:var(--text)">delegated access</strong>. Third-party app accesses resources WITHOUT seeing credentials. Most complex but most secure. Used for enterprise SSO, cloud platforms, social login.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--green);margin:20px 0 12px">Complete Python Example — Cisco DNA Center</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="lang-label">Python — Full REST API Workflow</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+    <pre class="code-body"><span class="p-kw">import</span> requests, json, urllib3
+urllib3.<span class="p-fn">disable_warnings</span>()
+
+BASE_URL = <span class="p-str">"https://sandboxdnac.cisco.com"</span>
+
+<span class="p-comment"># ── Step 1: POST credentials → receive token ──────────</span>
+auth = requests.<span class="p-fn">post</span>(
+    <span class="p-str">f"{BASE_URL}/dna/system/api/v1/auth/token"</span>,
+    auth=(<span class="p-str">"devnetuser"</span>, <span class="p-str">"Cisco123!"</span>),           <span class="p-comment"># Basic Auth</span>
+    headers={<span class="j-key">"Content-Type"</span>: <span class="j-str">"application/json"</span>},
+    verify=<span class="j-bool">False</span>
+)
+token = auth.<span class="p-fn">json</span>()[<span class="p-str">"Token"</span>]                   <span class="p-comment"># Extract token from JSON</span>
+hdrs = {<span class="j-key">"X-Auth-Token"</span>: token}               <span class="p-comment"># Reuse for all requests</span>
+
+<span class="p-comment"># ── Step 2: GET all devices ───────────────────────────</span>
+r = requests.<span class="p-fn">get</span>(<span class="p-str">f"{BASE_URL}/dna/intent/api/v1/network-device"</span>,
+                headers=hdrs, verify=<span class="j-bool">False</span>)
+devices = r.<span class="p-fn">json</span>()[<span class="p-str">"response"</span>]                <span class="p-comment"># Array of device objects</span>
+
+<span class="p-comment"># ── Step 3: Parse and display ─────────────────────────</span>
+<span class="p-kw">for</span> d <span class="p-kw">in</span> devices:
+    <span class="p-fn">print</span>(<span class="p-str">f"{d['hostname']:20} {d['managementIpAddress']:16} {d['reachabilityStatus']}"</span>)
+
+<span class="p-comment"># ── GET single device by ID ────────────────────────────</span>
+device_id = devices[<span class="p-num">0</span>][<span class="p-str">"id"</span>]
+single = requests.<span class="p-fn">get</span>(
+    <span class="p-str">f"{BASE_URL}/dna/intent/api/v1/network-device/{device_id}"</span>,
+    headers=hdrs, verify=<span class="j-bool">False</span>
+).<span class="p-fn">json</span>()[<span class="p-str">"response"</span>]
+<span class="p-fn">print</span>(<span class="p-str">f"\nFirst device uptime: {single['upTime']}"</span>)</pre>
+  </div>
+</div>
+
+<!-- Interactive REST API Console -->
+<div class="widget-panel" id="widget-api" style="margin-top:20px">
+  <div class="widget-header">⚡ REST API INTERACTIVE CONSOLE</div>
+  <div class="widget-body" style="padding:0">
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <div style="padding:18px;border-right:1px solid var(--border)">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.1em">REQUEST BUILDER</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <select id="api-method" class="inp" style="width:110px;flex-shrink:0">
+            <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option>
+          </select>
+          <input class="inp" id="api-url" value="/dna/intent/api/v1/network-device" style="flex:1;font-size:11px">
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+          <button class="btn btn-cyan" style="font-size:9px;padding:5px 10px" onclick="loadEx('devices')">GET Devices</button>
+          <button class="btn btn-blue" style="font-size:9px;padding:5px 10px" onclick="loadEx('post')">POST Create</button>
+          <button class="btn btn-red" style="font-size:9px;padding:5px 10px" onclick="loadEx('delete')">DELETE</button>
+          <button class="btn btn-amber" style="font-size:9px;padding:5px 10px" onclick="loadEx('401')">401 Error</button>
+        </div>
+        <button class="btn btn-green" onclick="runApi()" style="width:100%;justify-content:center">▶ SEND REQUEST</button>
+      </div>
+      <div style="padding:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em">RESPONSE</div>
+          <span id="api-status-badge" class="badge badge-blue">— —</span>
+        </div>
+        <div id="api-response-panel" class="ansible-terminal" style="min-height:180px;font-size:11px;overflow-y:auto;max-height:260px">
+          <span style="color:var(--text-dim)">// Select a preset and click SEND REQUEST</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz 6.5 -->
+<div style="margin-top:28px">
+  <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);margin-bottom:18px;letter-spacing:0.08em">🎯 QUIZ — Section 6.5</div>
+
+  <div class="card" style="margin-bottom:14px" id="q65-1">
+    <div class="quiz-q"><strong>Q1.</strong> Which HTTP method is used to CREATE a new resource via REST API and is NOT idempotent?</div>
+    <button class="q-option" onclick="qa(this,'q65-1','w')">A) GET — retrieves data without change</button>
+    <button class="q-option" onclick="qa(this,'q65-1','w')">B) PUT — replaces entire resource, is idempotent</button>
+    <button class="q-option" onclick="qa(this,'q65-1','c')">C) POST — creates new resource, NOT idempotent</button>
+    <button class="q-option" onclick="qa(this,'q65-1','w')">D) PATCH — updates partial resource</button>
+    <div class="q-exp" id="exp-q65-1">✅ <strong>C is correct.</strong> POST creates a new resource and is NOT idempotent — calling POST twice creates two separate resources. PUT is idempotent because replacing the same resource twice produces the same final state. GET is safe and idempotent but reads only. PATCH performs partial updates.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q65-2">
+    <div class="quiz-q"><strong>Q2.</strong> A REST API returns HTTP status code 401. What does this indicate?</div>
+    <button class="q-option" onclick="qa(this,'q65-2','w')">A) The resource was not found at the specified URL</button>
+    <button class="q-option" onclick="qa(this,'q65-2','w')">B) The server encountered an internal error</button>
+    <button class="q-option" onclick="qa(this,'q65-2','c')">C) Authentication failed — missing or invalid credentials/token</button>
+    <button class="q-option" onclick="qa(this,'q65-2','w')">D) The client is authenticated but not authorized for this resource</button>
+    <div class="q-exp" id="exp-q65-2">✅ <strong>C is correct.</strong> 401 = authentication failure — no valid credentials or expired token. 404 (A) = resource not found. 500 (B) = server bug. 403 (D) = authenticated but not authorized — that is the key exam distinction: 401 means "who are you?", 403 means "I know who you are but you can't do this."</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q65-3">
+    <div class="quiz-q"><strong>Q3.</strong> Which REST API authentication method encodes credentials as Base64 and sends them in the Authorization header with EVERY request?</div>
+    <button class="q-option" onclick="qa(this,'q65-3','w')">A) API Key — static string per application</button>
+    <button class="q-option" onclick="qa(this,'q65-3','w')">B) OAuth 2.0 — delegated authorization framework</button>
+    <button class="q-option" onclick="qa(this,'q65-3','c')">C) Basic Authentication — Base64(username:password) every request</button>
+    <button class="q-option" onclick="qa(this,'q65-3','w')">D) Bearer Token — POST once to get token, then use token</button>
+    <div class="q-exp" id="exp-q65-3">✅ <strong>C is correct.</strong> Basic Auth combines username:password, Base64-encodes it, and sends it with every single request as "Authorization: Basic [encoded]". It is NOT encrypted — Base64 is reversible. Token/Bearer (D) sends credentials once, then reuses a short-lived token. API Key (A) is a static string, not Base64-encoded credentials.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q65-4">
+    <div class="quiz-q"><strong>Q4.</strong> An application needs to update ONLY the hostname field of an existing device resource via REST API, leaving all other fields unchanged. Which HTTP method is MOST appropriate?</div>
+    <button class="q-option" onclick="qa(this,'q65-4','w')">A) GET the resource, then modify locally</button>
+    <button class="q-option" onclick="qa(this,'q65-4','w')">B) POST a new version of the resource</button>
+    <button class="q-option" onclick="qa(this,'q65-4','w')">C) PUT — replace the entire resource with all fields</button>
+    <button class="q-option" onclick="qa(this,'q65-4','c')">D) PATCH — update only the specified fields</button>
+    <div class="q-exp" id="exp-q65-4">✅ <strong>D is correct.</strong> PATCH is designed for partial updates — you send only the fields you want to change ({"hostname": "new-name"}). PUT (C) replaces the ENTIRE resource, meaning you must send ALL fields or unspecified ones may be lost. For changing just one field, PATCH is correct and most efficient.</div>
+  </div>
+</div>
+
+<div class="summary-box">
+  <div class="summary-label">📋 EXAM-READY SUMMARY — 6.5</div>
+  <ul class="summary-list">
+    <li>GET(Read/200), POST(Create/201, NOT idempotent), PUT(Replace/200), PATCH(Partial/200), DELETE(Remove/204)</li>
+    <li>POST is the ONLY non-idempotent common HTTP verb — every POST creates a new separate resource</li>
+    <li>401 = authentication failed | 403 = authenticated but not authorized | 404 = resource not found</li>
+    <li>Basic Auth = Base64(user:pass) every request | Token = POST once reuse token | API Key = static string | OAuth 2.0 = delegated</li>
+    <li>Cisco DNA Center: <code style="font-family:'JetBrains Mono',monospace">X-Auth-Token</code> header | Meraki: <code style="font-family:'JetBrains Mono',monospace">X-Cisco-Meraki-API-Key</code> header</li>
+  </ul>
+</div>
+</section>
+
+<!-- ════════════════════════════════════
+     6.6 — CONFIG MANAGEMENT TOOLS
+════════════════════════════════════ -->
+<section class="section-block" id="s66" data-section="s66">
+<div class="section-eyebrow">TOPIC 6.6</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:26px;color:var(--text);margin-bottom:24px">Configuration Management — Ansible &amp; Terraform</h2>
+
+<div class="card card-glow-cyan">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--red);margin-bottom:16px">① Ansible — The Primary CCNA Focus</h3>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--red);font-weight:600;margin-bottom:10px">KEY ANSIBLE CHARACTERISTICS</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:2">
+        <div><span class="badge badge-red" style="margin-right:6px">AGENTLESS</span>No software on managed devices — SSH only</div>
+        <div><span class="badge badge-amber" style="margin-right:6px">PUSH MODEL</span>Control node pushes to devices</div>
+        <div><span class="badge badge-green" style="margin-right:6px">IDEMPOTENT</span>Run 10× same playbook = same result</div>
+        <div><span class="badge badge-blue" style="margin-right:6px">YAML</span>Playbooks written in YAML</div>
+        <div style="margin-top:10px;font-size:12.5px">Architecture: <strong style="color:var(--text)">Control Node → SSH → Network Devices</strong><br>No agent required on the managed device.</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:10px">KEY COMPONENTS</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:2">
+        <div><strong style="color:var(--red)">Inventory</strong> — list of managed devices (INI or YAML format)</div>
+        <div><strong style="color:var(--amber)">Playbook</strong> — YAML file with list of tasks to execute</div>
+        <div><strong style="color:var(--blue)">Module</strong> — pre-built function (cisco.ios.ios_vlans etc.)</div>
+        <div><strong style="color:var(--purple)">Variables</strong> — parameterize playbooks per device or group</div>
+        <div><strong style="color:var(--green)">Jinja2 Template</strong> — generate device-specific config from variables</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="lang-label">Ansible INI Inventory</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+    <pre class="code-body"><span class="y-comment"># /home/user/ansible/inventory.ini</span>
+[cisco_routers]
+R1 <span class="j-key">ansible_host</span>=<span class="j-str">192.168.1.1</span>
+R2 <span class="j-key">ansible_host</span>=<span class="j-str">192.168.1.2</span>
+
+[cisco_switches]
+SW1 <span class="j-key">ansible_host</span>=<span class="j-str">192.168.1.10</span>
+SW2 <span class="j-key">ansible_host</span>=<span class="j-str">192.168.1.11</span>
+
+[all:vars]
+<span class="j-key">ansible_user</span>=<span class="j-str">admin</span>
+<span class="j-key">ansible_password</span>=<span class="j-str">Cisco123</span>
+<span class="j-key">ansible_network_os</span>=<span class="j-str">ios</span>          <span class="y-comment"># Identifies this as IOS device</span>
+<span class="j-key">ansible_connection</span>=<span class="j-str">network_cli</span>   <span class="y-comment"># Use CLI over SSH</span></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="lang-label">Ansible Playbook — Complete VLAN + NTP Configuration</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+    <pre class="code-body"><span class="y-dash">---</span>
+<span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Configure VLANs and NTP on all switches</span>
+  <span class="y-key">hosts</span>: <span class="y-str">cisco_switches</span>
+  <span class="y-key">gather_facts</span>: <span class="j-bool">no</span>           <span class="y-comment"># Disable for network devices</span>
+  <span class="y-key">vars</span>:
+    <span class="y-key">vlans</span>:
+      <span class="y-dash">-</span> <span class="y-key">id</span>: <span class="p-num">10</span>
+        <span class="y-key">name</span>: <span class="y-str">Sales</span>
+      <span class="y-dash">-</span> <span class="y-key">id</span>: <span class="p-num">20</span>
+        <span class="y-key">name</span>: <span class="y-str">HR</span>
+
+  <span class="y-key">tasks</span>:
+    <span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Create VLANs on all switches</span>
+      <span class="y-key">cisco.ios.ios_vlans</span>:
+        <span class="y-key">config</span>: <span class="y-str">"{{ vlans }}"</span>
+        <span class="y-key">state</span>: <span class="y-str">merged</span>           <span class="y-comment"># Add, don't replace existing VLANs</span>
+
+    <span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Configure NTP server</span>
+      <span class="y-key">cisco.ios.ios_ntp_global</span>:
+        <span class="y-key">config</span>:
+          <span class="y-key">servers</span>:
+            <span class="y-dash">-</span> <span class="y-key">server</span>: <span class="y-str">192.168.1.100</span>
+              <span class="y-key">prefer</span>: <span class="j-bool">true</span>
+        <span class="y-key">state</span>: <span class="y-str">merged</span>
+
+    <span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Verify VLANs configured</span>
+      <span class="y-key">cisco.ios.ios_command</span>:
+        <span class="y-key">commands</span>: <span class="y-str">show vlan brief</span>
+      <span class="y-key">register</span>: <span class="y-str">vlan_output</span>   <span class="y-comment"># Save output to variable</span>
+
+    <span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Display VLAN verification output</span>
+      <span class="y-key">debug</span>:
+        <span class="y-key">var</span>: <span class="y-str">vlan_output.stdout_lines</span>
+
+<span class="y-comment"># Run: ansible-playbook site.yml -i inventory.ini -v</span></pre>
+  </div>
+
+  <!-- Ansible Simulator Widget -->
+  <div class="widget-panel" id="widget-ansible" style="margin-top:16px">
+    <div class="widget-header">⚡ ANSIBLE PLAYBOOK SIMULATOR — Observe idempotency</div>
+    <div class="widget-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em">Playbook</div>
+          <div style="background:#000;border:1px solid var(--border);border-radius:4px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.9">
+            <span style="color:var(--text-dim)">---</span><br>
+            <span style="color:var(--blue)">- name</span>: <span style="color:var(--green)">Configure VLANs</span><br>
+            &nbsp;&nbsp;<span style="color:var(--blue)">hosts</span>: <span style="color:var(--green)">cisco_switches</span><br>
+            &nbsp;&nbsp;<span style="color:var(--blue)">tasks</span>:<br>
+            &nbsp;&nbsp;<span style="color:var(--amber)">- name</span>: <span style="color:var(--green)">Create VLAN 10</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--blue)">cisco.ios.ios_vlans</span>:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--blue)">config</span>: <span style="color:var(--text-dim)">[{id:10, name:Sales}]</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--blue)">state</span>: <span style="color:var(--green)">merged</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn btn-green" onclick="runAnsible(1)" style="font-size:10px">▶ Run 1st time</button>
+            <button class="btn btn-cyan" onclick="runAnsible(2)" style="font-size:10px">▶ Run 2nd (idempotency)</button>
+            <button class="btn btn-red" onclick="runAnsible('error')" style="font-size:10px">⚡ Inject Error</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em">Output</div>
+          <div id="ansible-output" class="ansible-terminal" style="min-height:190px">
+            <span style="color:var(--text-dim)"># Click RUN to execute</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terraform -->
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--violet);margin:28px 0 14px">② Terraform — Infrastructure as Code</h3>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--violet);font-weight:600;margin-bottom:10px">KEY TERRAFORM FACTS</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:2">
+        <div><span class="badge badge-violet" style="margin-right:6px">DECLARATIVE</span>Define WHAT you want (not HOW)</div>
+        <div><span class="badge badge-purple" style="margin-right:6px">STATE FILE</span>Tracks current vs desired state</div>
+        <div><span class="badge badge-blue" style="margin-right:6px">HCL</span>HashiCorp Configuration Language</div>
+        <div><span class="badge badge-green" style="margin-right:6px">PROVIDERS</span>Plugins for each platform (Cisco, AWS, Azure)</div>
+        <div style="margin-top:10px;font-size:12.5px">
+          <code style="color:var(--green)">terraform init</code> → download providers<br>
+          <code style="color:var(--amber)">terraform plan</code> → preview (dry run!)<br>
+          <code style="color:var(--blue)">terraform apply</code> → make changes<br>
+          <code style="color:var(--red)">terraform destroy</code> → remove all managed resources
+        </div>
+      </div>
+    </div>
+    <div class="code-block" style="margin:0">
+      <div class="code-header"><span class="lang-label">Terraform HCL — Cisco Meraki VLAN</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+      <pre class="code-body" style="font-size:11px"><span class="y-comment"># main.tf — declarative desired state</span>
+terraform {
+  required_providers {
+    meraki = {
+      source = <span class="p-str">"CiscoDevNet/meraki"</span>
+    }
+  }
+}
+
+provider <span class="p-str">"meraki"</span> {
+  api_key = <span class="p-str">var.meraki_api_key</span>
+}
+
+<span class="p-comment"># DECLARE desired VLAN — Terraform figures out HOW</span>
+resource <span class="p-str">"meraki_networks_vlans"</span> <span class="p-str">"sales"</span> {
+  network_id   = <span class="p-str">"L_123456789"</span>
+  vlan_id      = <span class="p-num">10</span>
+  name         = <span class="p-str">"Sales"</span>
+  subnet       = <span class="p-str">"192.168.10.0/24"</span>
+  appliance_ip = <span class="p-str">"192.168.10.1"</span>
+}
+<span class="p-comment"># terraform plan → terraform apply</span></pre>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--amber);margin:18px 0 12px">Ansible vs Terraform — EXAM-CRITICAL Comparison</h3>
+  <table style="margin-bottom:14px">
+    <tr><th>Feature</th><th style="color:var(--red)">Ansible</th><th style="color:var(--violet)">Terraform</th><th>Puppet / Chef</th></tr>
+    <tr><td>Approach</td><td>Procedural — HOW to do it</td><td style="color:var(--violet)">Declarative — WHAT you want</td><td>Declarative</td></tr>
+    <tr><td>State tracking</td><td style="color:var(--red)">None — runs tasks in order</td><td style="color:var(--violet)">State file (terraform.tfstate)</td><td>Catalog/report</td></tr>
+    <tr><td>Agent required?</td><td style="color:var(--green)">NO — agentless SSH</td><td style="color:var(--green)">NO — API calls via provider</td><td style="color:var(--red)">YES — agent on device</td></tr>
+    <tr><td>Syntax</td><td>YAML</td><td style="color:var(--violet)">HCL</td><td>Ruby DSL</td></tr>
+    <tr><td>Model</td><td>PUSH — control node pushes</td><td>API — provider calls</td><td style="color:var(--amber)">PULL — agent pulls config</td></tr>
+    <tr><td>Best for</td><td>Network device config</td><td style="color:var(--violet)">Cloud / SDN infrastructure</td><td>Server config management</td></tr>
+  </table>
+
+  <div class="callout callout-memo">
+    <span class="callout-label">📌 Memorize for Exam</span>
+    <span class="callout-text">
+      <strong>Ansible:</strong> Agentless · SSH · Push · YAML · Procedural · No state file<br>
+      <strong>Terraform:</strong> No agent · API · Declarative · HCL · State file (terraform.tfstate)<br>
+      <strong>Puppet/Chef:</strong> AGENT-BASED (agents run on managed nodes) · PULL model — opposite of Ansible
+    </span>
+  </div>
+</div>
+
+<!-- Quiz 6.6 -->
+<div style="margin-top:28px">
+  <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);margin-bottom:18px;letter-spacing:0.08em">🎯 QUIZ — Section 6.6</div>
+
+  <div class="card" style="margin-bottom:14px" id="q66-1">
+    <div class="quiz-q"><strong>Q1.</strong> Which configuration management tool is AGENTLESS and uses SSH to manage network devices without requiring any software on the managed device?</div>
+    <button class="q-option" onclick="qa(this,'q66-1','w')">A) Puppet — requires puppet agent on managed nodes</button>
+    <button class="q-option" onclick="qa(this,'q66-1','w')">B) Chef — requires chef-client on managed nodes</button>
+    <button class="q-option" onclick="qa(this,'q66-1','c')">C) Ansible — agentless, SSH only, no software needed on devices</button>
+    <button class="q-option" onclick="qa(this,'q66-1','w')">D) SaltStack — typically uses salt-minion agents</button>
+    <div class="q-exp" id="exp-q66-1">✅ <strong>C is correct.</strong> Ansible is famously agentless — it connects via SSH only. No agent software is installed on managed devices. Puppet (A) and Chef (B) require agents. This agentless model makes Ansible ideal for network devices which cannot run third-party agent software.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q66-2">
+    <div class="quiz-q"><strong>Q2.</strong> A network engineer runs the same Ansible playbook twice. The second execution shows 'changed=0' for all tasks. What property of Ansible does this demonstrate?</div>
+    <button class="q-option" onclick="qa(this,'q66-2','w')">A) Recursion</button>
+    <button class="q-option" onclick="qa(this,'q66-2','c')">B) Idempotency — running multiple times produces the same result without re-applying changes</button>
+    <button class="q-option" onclick="qa(this,'q66-2','w')">C) Atomicity</button>
+    <button class="q-option" onclick="qa(this,'q66-2','w')">D) Convergence</button>
+    <div class="q-exp" id="exp-q66-2">✅ <strong>B is correct.</strong> Idempotency means running the same operation multiple times produces the same result as running it once. On the second run, Ansible checks: "Is VLAN 10 already configured?" — yes → no change needed → changed=0. This is not a problem; it is working exactly as designed.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q66-3">
+    <div class="quiz-q"><strong>Q3.</strong> Which tool uses HCL (HashiCorp Configuration Language) and maintains a state file to track infrastructure?</div>
+    <button class="q-option" onclick="qa(this,'q66-3','w')">A) Ansible</button>
+    <button class="q-option" onclick="qa(this,'q66-3','w')">B) Puppet</button>
+    <button class="q-option" onclick="qa(this,'q66-3','w')">C) Chef</button>
+    <button class="q-option" onclick="qa(this,'q66-3','c')">D) Terraform</button>
+    <div class="q-exp" id="exp-q66-3">✅ <strong>D is correct.</strong> Terraform is uniquely identified by HCL syntax and the state file (terraform.tfstate). The state file is what allows Terraform to know what it currently manages and calculate the difference (terraform plan) before applying changes. Ansible (A) uses YAML with no state file.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q66-4">
+    <div class="quiz-q"><strong>Q4.</strong> Ansible applies configuration to network devices using which model?</div>
+    <button class="q-option" onclick="qa(this,'q66-4','w')">A) Pull — devices pull configuration from Ansible server</button>
+    <button class="q-option" onclick="qa(this,'q66-4','c')">B) Push — Ansible control node pushes configuration to devices</button>
+    <button class="q-option" onclick="qa(this,'q66-4','w')">C) Polling — Ansible polls devices every 60 seconds</button>
+    <button class="q-option" onclick="qa(this,'q66-4','w')">D) Event-driven — devices send events to trigger Ansible</button>
+    <div class="q-exp" id="exp-q66-4">✅ <strong>B is correct.</strong> Ansible uses a PUSH model — the control node initiates SSH connections and pushes configuration TO devices. Puppet and Chef use a PULL model — the agent on the device periodically checks in and pulls its configuration. Push vs Pull is a key CCNA exam distinction.</div>
+  </div>
+</div>
+
+<div class="summary-box">
+  <div class="summary-label">📋 EXAM-READY SUMMARY — 6.6</div>
+  <ul class="summary-list">
+    <li><strong>Ansible:</strong> Agentless · SSH · Push model · YAML playbooks · Idempotent · No state file — best for network device config</li>
+    <li><strong>Terraform:</strong> Declarative · HCL · State file (terraform.tfstate) · Plan/Apply/Destroy · Provider-based API calls</li>
+    <li><strong>Puppet/Chef:</strong> Agent-based (software required on managed nodes) · Pull model — agents pull from server</li>
+    <li>Ansible idempotency: changed=0 on 2nd run = correct behavior (not an error)</li>
+    <li>terraform plan = safe dry-run preview — always run before apply in production</li>
+  </ul>
+</div>
+</section>
+
+<!-- ════════════════════════════════════
+     6.7 — JSON DATA
+════════════════════════════════════ -->
+<section class="section-block" id="s67" data-section="s67">
+<div class="section-eyebrow">TOPIC 6.7</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:26px;color:var(--text);margin-bottom:24px">JSON-Encoded Data — All Components</h2>
+
+<div class="card card-glow-cyan">
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:17px;color:var(--yellow);margin-bottom:16px">① JSON — The Universal API Data Format</h3>
+  <p style="color:var(--text-dim);margin-bottom:16px">JSON (JavaScript Object Notation, RFC 8259) is the dominant data format for REST APIs. 95%+ of modern network controller APIs return JSON. It is human-readable, lightweight, and language-independent.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+    <div>
+      <div class="callout callout-memo" style="margin:0">
+        <span class="callout-label">📌 JSON Syntax Rules — ALL Critical</span>
+        <span class="callout-text">
+          1. Strings: MUST use <strong>double quotes</strong> — not single<br>
+          2. Boolean: lowercase <strong>true / false</strong> (not True/False)<br>
+          3. Null: lowercase <strong>null</strong> (not None or NULL)<br>
+          4. No trailing comma after last item in array/object<br>
+          5. No comments allowed inside JSON<br>
+          6. All object keys MUST be double-quoted strings
+        </span>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--text-dim);font-weight:600;margin-bottom:8px;letter-spacing:0.08em">6 JSON DATA TYPES</div>
+      <div style="background:#000;border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2.2">
+        <div><span class="j-str">"hello"</span>       <span style="color:var(--text-dim)">← String (double quotes)</span></div>
+        <div><span class="j-num">42</span>  <span class="j-num">3.14</span>    <span style="color:var(--text-dim)">← Number (int or float)</span></div>
+        <div><span class="j-bool">true</span>  <span class="j-bool">false</span>  <span style="color:var(--text-dim)">← Boolean (lowercase!)</span></div>
+        <div><span class="j-null">null</span>          <span style="color:var(--text-dim)">← Null (lowercase!)</span></div>
+        <div><span class="j-brace">[</span><span class="j-str">"a"</span><span class="j-brace">,</span><span class="j-str">"b"</span><span class="j-brace">]</span>    <span style="color:var(--text-dim)">← Array [ ]</span></div>
+        <div><span class="j-brace">{</span><span class="j-key">"k"</span><span class="j-brace">:</span><span class="j-str">"v"</span><span class="j-brace">}</span>   <span style="color:var(--text-dim)">← Object { }</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="lang-label">JSON — Annotated Cisco DNA Center API Response</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+    <pre class="code-body"><span class="j-brace">{</span>
+  <span class="j-key">"response"</span><span class="j-brace">: [</span>               <span class="j-comment">← KEY (string) : VALUE (array)</span>
+    <span class="j-brace">{</span>                          <span class="j-comment">← Object — first device (index 0)</span>
+      <span class="j-key">"id"</span><span class="j-brace">: </span><span class="j-str">"abc-123-def-456"</span><span class="j-brace">,</span>  <span class="j-comment">← STRING</span>
+      <span class="j-key">"hostname"</span><span class="j-brace">: </span><span class="j-str">"R1.lab"</span><span class="j-brace">,</span>
+      <span class="j-key">"managementIpAddress"</span><span class="j-brace">: </span><span class="j-str">"192.168.1.1"</span><span class="j-brace">,</span>
+      <span class="j-key">"softwareVersion"</span><span class="j-brace">: </span><span class="j-str">"16.9.6"</span><span class="j-brace">,</span>  <span class="j-comment">← STRING (looks like number, but it's quoted!)</span>
+      <span class="j-key">"reachabilityStatus"</span><span class="j-brace">: </span><span class="j-str">"Reachable"</span><span class="j-brace">,</span>
+      <span class="j-key">"lastUpdateTime"</span><span class="j-brace">: </span><span class="j-num">1706788200</span><span class="j-brace">,</span> <span class="j-comment">← NUMBER (Unix timestamp)</span>
+      <span class="j-key">"errorCode"</span><span class="j-brace">: </span><span class="j-null">null</span><span class="j-brace">,</span>           <span class="j-comment">← NULL (no error, lowercase)</span>
+      <span class="j-key">"managed"</span><span class="j-brace">: </span><span class="j-bool">true</span><span class="j-brace">,</span>            <span class="j-comment">← BOOLEAN (lowercase, NO quotes!)</span>
+      <span class="j-key">"interfaceCount"</span><span class="j-brace">: </span><span class="j-num">4</span><span class="j-brace">,</span>        <span class="j-comment">← NUMBER integer</span>
+      <span class="j-key">"series"</span><span class="j-brace">: </span><span class="j-str">"CSR 1000V"</span>      <span class="j-comment">← No trailing comma on last item!</span>
+    <span class="j-brace">}</span>
+  <span class="j-brace">],</span>
+  <span class="j-key">"version"</span><span class="j-brace">: </span><span class="j-str">"1.0"</span>             <span class="j-comment">← Top-level key, STRING value</span>
+<span class="j-brace">}</span></pre>
+  </div>
+
+  <div class="code-block" style="margin-top:16px">
+    <div class="code-header"><span class="lang-label">Python — Accessing JSON Data (All Access Patterns)</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+    <pre class="code-body"><span class="p-kw">import</span> json
+
+<span class="p-comment"># Parse JSON string → Python dict</span>
+data = json.<span class="p-fn">loads</span>(<span class="p-str">'{"hostname": "R1", "ip": "10.0.0.1"}'</span>)
+<span class="p-fn">print</span>(data[<span class="p-str">"hostname"</span>])              <span class="p-comment"># R1</span>
+<span class="p-fn">print</span>(data.<span class="p-fn">get</span>(<span class="p-str">"missing"</span>, <span class="p-str">"N/A"</span>))   <span class="p-comment"># N/A (safe access, no KeyError)</span>
+
+<span class="p-comment"># Access array of objects (most common API pattern)</span>
+response = {
+    <span class="p-str">"response"</span>: [
+        {<span class="p-str">"hostname"</span>: <span class="p-str">"R1"</span>, <span class="p-str">"ip"</span>: <span class="p-str">"10.0.0.1"</span>},
+        {<span class="p-str">"hostname"</span>: <span class="p-str">"R2"</span>, <span class="p-str">"ip"</span>: <span class="p-str">"10.0.0.2"</span>}
+    ]
+}
+
+<span class="p-comment"># Access R2's IP:  key → array index → key</span>
+r2_ip = response[<span class="p-str">"response"</span>][<span class="p-num">1</span>][<span class="p-str">"ip"</span>]  <span class="p-comment"># → "10.0.0.2"</span>
+
+<span class="p-comment"># Iterate all devices</span>
+<span class="p-kw">for</span> device <span class="p-kw">in</span> response[<span class="p-str">"response"</span>]:
+    <span class="p-fn">print</span>(<span class="p-str">f"{device['hostname']} → {device['ip']}"</span>)
+
+<span class="p-comment"># Python dict → JSON string (pretty-printed)</span>
+d = {<span class="p-str">"vlan"</span>: <span class="p-num">10</span>, <span class="p-str">"name"</span>: <span class="p-str">"Sales"</span>, <span class="p-str">"active"</span>: <span class="p-kw">True</span>}
+<span class="p-fn">print</span>(json.<span class="p-fn">dumps</span>(d, indent=<span class="p-num">2</span>))
+<span class="p-comment"># {
+#   "vlan": 10,
+#   "name": "Sales",
+#   "active": true   ← Python True becomes JSON true
+# }</span></pre>
+  </div>
+
+  <h3 style="font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--red);margin:20px 0 12px">Common JSON Errors — Exam Will Show Broken JSON</h3>
+  <table style="margin-bottom:16px">
+    <tr><th>#</th><th>Error</th><th style="color:var(--red)">Invalid JSON</th><th style="color:var(--green)">Valid JSON</th></tr>
+    <tr><td>1</td><td>Single quotes</td><td><code style="color:var(--red);font-family:'JetBrains Mono',monospace">{'key': 'val'}</code></td><td><code style="color:var(--green);font-family:'JetBrains Mono',monospace">{"key": "val"}</code></td></tr>
+    <tr><td>2</td><td>Trailing comma</td><td><code style="color:var(--red);font-family:'JetBrains Mono',monospace">{"a":1,"b":2,}</code></td><td><code style="color:var(--green);font-family:'JetBrains Mono',monospace">{"a":1,"b":2}</code></td></tr>
+    <tr><td>3</td><td>Unquoted key</td><td><code style="color:var(--red);font-family:'JetBrains Mono',monospace">{hostname:"R1"}</code></td><td><code style="color:var(--green);font-family:'JetBrains Mono',monospace">{"hostname":"R1"}</code></td></tr>
+    <tr><td>4</td><td>Python boolean</td><td><code style="color:var(--red);font-family:'JetBrains Mono',monospace">{"active": True}</code></td><td><code style="color:var(--green);font-family:'JetBrains Mono',monospace">{"active": true}</code></td></tr>
+    <tr><td>5</td><td>Comment in JSON</td><td><code style="color:var(--red);font-family:'JetBrains Mono',monospace">{"ip": "1.1" // r1}</code></td><td><code style="color:var(--green);font-family:'JetBrains Mono',monospace">{"ip": "1.1"}</code></td></tr>
+    <tr><td>6</td><td>Missing comma</td><td><code style="color:var(--red);font-family:'JetBrains Mono',monospace">{"a":1 "b":2}</code></td><td><code style="color:var(--green);font-family:'JetBrains Mono',monospace">{"a":1,"b":2}</code></td></tr>
+  </table>
+</div>
+
+<!-- JSON Tree Visualizer -->
+<div class="widget-panel" id="widget-json" style="margin-top:20px">
+  <div class="widget-header">⚡ JSON TREE VISUALIZER — Edit JSON, see live tree</div>
+  <div class="widget-body" style="padding:0">
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <div style="padding:16px;border-right:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:0.08em">JSON Input</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-green" style="font-size:9px;padding:4px 8px" onclick="validateJSON()">✓ Validate</button>
+            <button class="btn btn-red" style="font-size:9px;padding:4px 8px" onclick="breakJSON()">⚡ Break It</button>
+          </div>
+        </div>
+        <textarea id="json-input" class="inp" style="height:260px;resize:vertical;font-size:11px;line-height:1.6" oninput="updateJSONTree()">{
+  "response": [
+    {
+      "id": "abc-123-def-456",
+      "hostname": "R1.company.local",
+      "managementIpAddress": "192.168.1.1",
+      "platformId": "CSR1000V",
+      "managed": true,
+      "interfaceCount": 4,
+      "errorCode": null
+    }
+  ],
+  "version": "1.0"
+}</textarea>
+        <div id="json-status" style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green)">✓ Valid JSON</div>
+      </div>
+      <div style="padding:16px">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:11px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Visual Tree</div>
+        <div id="json-tree" style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:2;overflow-y:auto;max-height:300px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quiz 6.7 -->
+<div style="margin-top:28px">
+  <div style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);margin-bottom:18px;letter-spacing:0.08em">🎯 QUIZ — Section 6.7</div>
+
+  <div class="card" style="margin-bottom:14px" id="q67-1">
+    <div class="quiz-q"><strong>Q1.</strong> Which of the following represents VALID JSON?</div>
+    <button class="q-option" onclick="qa(this,'q67-1','w')">A) {'hostname': 'R1', 'ip': '10.0.0.1'}</button>
+    <button class="q-option" onclick="qa(this,'q67-1','c')">B) {"hostname": "R1", "ip": "10.0.0.1"}</button>
+    <button class="q-option" onclick="qa(this,'q67-1','w')">C) {"hostname": "R1", "ip": "10.0.0.1",}</button>
+    <button class="q-option" onclick="qa(this,'q67-1','w')">D) {hostname: "R1", ip: "10.0.0.1"}</button>
+    <div class="q-exp" id="exp-q67-1">✅ <strong>B is correct.</strong> B uses double-quoted keys and values with no trailing comma — fully valid JSON. A uses single quotes (invalid). C has a trailing comma after the last element (invalid). D has unquoted keys (all JSON keys must be double-quoted strings).</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q67-2">
+    <div class="quiz-q"><strong>Q2.</strong> In JSON, how is an ARRAY represented?</div>
+    <button class="q-option" onclick="qa(this,'q67-2','w')">A) Curly braces { } — these are objects</button>
+    <button class="q-option" onclick="qa(this,'q67-2','c')">B) Square brackets [ ]</button>
+    <button class="q-option" onclick="qa(this,'q67-2','w')">C) Angle brackets &lt; &gt; — these are XML</button>
+    <button class="q-option" onclick="qa(this,'q67-2','w')">D) Parentheses ( ) — not used in JSON</button>
+    <div class="q-exp" id="exp-q67-2">✅ <strong>B is correct.</strong> Arrays use square brackets [ ] — ordered list of values. Objects use curly braces { } — key:value pairs. Example: "vlans": [10, 20, 30] is an array of numbers. Angle brackets are XML. Parentheses have no role in JSON.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q67-3">
+    <div class="quiz-q"><strong>Q3.</strong> What is the correct JSON representation of a boolean true value?</div>
+    <button class="q-option" onclick="qa(this,'q67-3','w')">A) "true" — this is a string, not a boolean</button>
+    <button class="q-option" onclick="qa(this,'q67-3','w')">B) True — Python style, invalid JSON</button>
+    <button class="q-option" onclick="qa(this,'q67-3','c')">C) true — lowercase, no quotes</button>
+    <button class="q-option" onclick="qa(this,'q67-3','w')">D) TRUE — uppercase, invalid JSON</button>
+    <div class="q-exp" id="exp-q67-3">✅ <strong>C is correct.</strong> JSON booleans are lowercase: true and false. "true" (with quotes) is a STRING. True (capitalized) is Python syntax — invalid JSON. This Python True vs JSON true confusion is extremely common and frequently tested on CCNA.</div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px" id="q67-4">
+    <div class="quiz-q"><strong>Q4.</strong> After <code style="font-family:'JetBrains Mono',monospace">data = json.loads(response_text)</code>, how would a developer access R2's IP address from this JSON: <code style="font-family:'JetBrains Mono',monospace;display:block;margin-top:6px;padding:6px;background:#000;color:var(--green);border-radius:3px">{"response":[{"hostname":"R1","ip":"10.0.0.1"},{"hostname":"R2","ip":"10.0.0.2"}]}</code></div>
+    <button class="q-option" onclick="qa(this,'q67-4','w')">A) data['response']['ip']</button>
+    <button class="q-option" onclick="qa(this,'q67-4','c')">B) data['response'][1]['ip']</button>
+    <button class="q-option" onclick="qa(this,'q67-4','w')">C) data[1]['ip']</button>
+    <button class="q-option" onclick="qa(this,'q67-4','w')">D) data['response']['R2']['ip']</button>
+    <div class="q-exp" id="exp-q67-4">✅ <strong>B is correct.</strong> Step by step: data['response'] → gets the array. [1] → second item (arrays are 0-indexed: 0=R1, 1=R2). ['ip'] → gets ip key. A is wrong because 'response' maps to an array, not a dict (can't use string key to access array). C skips the 'response' key. D uses a string index on an array (invalid).</div>
+  </div>
+</div>
+
+<div class="summary-box">
+  <div class="summary-label">📋 EXAM-READY SUMMARY — 6.7</div>
+  <ul class="summary-list">
+    <li>6 JSON types: String (double quotes), Number, Boolean (true/false lowercase), Null (lowercase), Array ([]), Object ({})</li>
+    <li>Arrays = square brackets [] | Objects = curly braces {} | Never use single quotes</li>
+    <li>Most common errors: single quotes · trailing comma · Python-style True/False · unquoted keys · comments</li>
+    <li>Array access: data['key'][index]['field'] — e.g., data['response'][0]['hostname'] for first device</li>
+    <li>json.loads() = parse string → Python dict | json.dumps(indent=2) = pretty-print dict → JSON string</li>
+  </ul>
+</div>
+</section>
+
+<!-- ════════════════════════════════════
+     LABS
+════════════════════════════════════ -->
+<section class="section-block" id="lab1" style="background:rgba(74,222,128,0.02)">
+<div class="section-eyebrow" style="color:var(--green);border-color:rgba(74,222,128,0.2);background:rgba(74,222,128,0.06)">⚙ GNS3 LAB 1</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:22px;color:var(--green);margin-bottom:20px">Python REST API — Cisco DNA Center DevNet Sandbox</h2>
+
+<div class="callout callout-fact"><span class="callout-label">🔬 Lab Objective</span><span class="callout-text">Authenticate against Cisco DNA Center DevNet Sandbox (free, browser-accessible), retrieve device inventory, parse JSON, and display formatted output. URL: <strong>sandboxdnac.cisco.com</strong> | User: devnetuser | Pass: Cisco123!</span></div>
+
+<div class="code-block">
+  <div class="code-header"><span class="lang-label">Python — Complete Runnable Lab Script</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+  <pre class="code-body"><span class="p-comment">#!/usr/bin/env python3
+# GNS3 Lab 1: DNA Center REST API
+# pip3 install requests</span>
+
+<span class="p-kw">import</span> requests, json, urllib3
+urllib3.<span class="p-fn">disable_warnings</span>()
+
+BASE = <span class="p-str">"https://sandboxdnac.cisco.com"</span>
+USER, PASS = <span class="p-str">"devnetuser"</span>, <span class="p-str">"Cisco123!"</span>
+
+<span class="p-comment"># 1) Authenticate</span>
+r = requests.<span class="p-fn">post</span>(<span class="p-str">f"{BASE}/dna/system/api/v1/auth/token"</span>,
+    auth=(USER, PASS), verify=<span class="j-bool">False</span>)
+token = r.<span class="p-fn">json</span>()[<span class="p-str">"Token"</span>]
+hdrs = {<span class="j-key">"X-Auth-Token"</span>: token}
+
+<span class="p-comment"># 2) GET all devices</span>
+devices = requests.<span class="p-fn">get</span>(<span class="p-str">f"{BASE}/dna/intent/api/v1/network-device"</span>,
+    headers=hdrs, verify=<span class="j-bool">False</span>).<span class="p-fn">json</span>()[<span class="p-str">"response"</span>]
+
+<span class="p-comment"># 3) Parse + display</span>
+<span class="p-fn">print</span>(<span class="p-str">f"Found {len(devices)} devices:\n"</span> + <span class="p-str">"-"</span>*55)
+<span class="p-kw">for</span> d <span class="p-kw">in</span> devices:
+    icon = <span class="p-str">"✓"</span> <span class="p-kw">if</span> d.<span class="p-fn">get</span>(<span class="p-str">"reachabilityStatus"</span>) == <span class="p-str">"Reachable"</span> <span class="p-kw">else</span> <span class="p-str">"✗"</span>
+    <span class="p-fn">print</span>(<span class="p-str">f"{icon} {d.get('hostname','N/A'):25} {d.get('managementIpAddress','N/A'):16} {d.get('platformId','N/A')}"</span>)</pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header"><span class="lang-label">Expected Output</span></div>
+  <pre class="code-body"><span class="cli-output">Found 4 devices:
+-------------------------------------------------------
+✓ leaf1.abc.inc             10.10.22.66       C9KV-UADP-8P
+✓ leaf2.abc.inc             10.10.22.70       C9KV-UADP-8P
+✓ spine1.abc.inc            10.10.22.74       C9KV-UADP-8P
+✗ border-router.abc.inc     10.10.22.98       CSR1000V</span></pre>
+</div>
+</section>
+
+<section class="section-block" id="lab2" style="background:rgba(239,68,68,0.02)">
+<div class="section-eyebrow" style="color:var(--red);border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.06)">⚙ GNS3 LAB 2</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:22px;color:var(--red);margin-bottom:20px">Ansible Network Automation — VLAN, NTP &amp; OSPF</h2>
+
+<div class="callout callout-fact"><span class="callout-label">🔬 Setup</span><span class="callout-text">Ubuntu Control Node → R1, R2, R3 (IOS-XE/IOSv), SW1, SW2 (IOSvL2) via GNS3 management cloud. Install: <code style="color:var(--green)">pip3 install ansible && ansible-galaxy collection install cisco.ios</code></span></div>
+
+<div class="code-block">
+  <div class="code-header"><span class="lang-label">Ansible Playbook — VLAN + NTP + OSPF</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+  <pre class="code-body"><span class="y-dash">---</span>
+<span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Configure campus network baseline</span>
+  <span class="y-key">hosts</span>: <span class="y-str">cisco_switches</span>
+  <span class="y-key">gather_facts</span>: <span class="j-bool">no</span>
+  <span class="y-key">tasks</span>:
+    <span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Create VLANs</span>
+      <span class="y-key">cisco.ios.ios_vlans</span>:
+        <span class="y-key">config</span>:
+          <span class="y-dash">-</span> <span class="y-key">vlan_id</span>: <span class="p-num">10</span>
+            <span class="y-key">name</span>: <span class="y-str">Sales</span>
+          <span class="y-dash">-</span> <span class="y-key">vlan_id</span>: <span class="p-num">20</span>
+            <span class="y-key">name</span>: <span class="y-str">HR</span>
+        <span class="y-key">state</span>: <span class="y-str">merged</span>
+
+<span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Configure routers — NTP and OSPF</span>
+  <span class="y-key">hosts</span>: <span class="y-str">cisco_routers</span>
+  <span class="y-key">gather_facts</span>: <span class="j-bool">no</span>
+  <span class="y-key">tasks</span>:
+    <span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Set NTP server</span>
+      <span class="y-key">cisco.ios.ios_config</span>:
+        <span class="y-key">lines</span>:
+          <span class="y-dash">-</span> <span class="y-str">ntp server 192.168.1.100 prefer</span>
+
+    <span class="y-dash">-</span> <span class="y-key">name</span>: <span class="y-str">Configure OSPF area 0</span>
+      <span class="y-key">cisco.ios.ios_ospfv2</span>:
+        <span class="y-key">config</span>:
+          <span class="y-key">processes</span>:
+            <span class="y-dash">-</span> <span class="y-key">process_id</span>: <span class="p-num">1</span>
+              <span class="y-key">router_id</span>: <span class="y-str">"{{ ospf_router_id }}"</span>
+              <span class="y-key">network</span>:
+                <span class="y-dash">-</span> <span class="y-key">address</span>: <span class="y-str">10.0.0.0</span>
+                  <span class="y-key">wildcard_bits</span>: <span class="y-str">0.255.255.255</span>
+                  <span class="y-key">area</span>: <span class="p-num">0</span>
+        <span class="y-key">state</span>: <span class="y-str">merged</span></pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header"><span class="lang-label">Expected ansible-playbook Output (1st run vs 2nd run)</span></div>
+  <pre class="code-body"><span class="y-comment"># FIRST RUN — changes applied</span>
+<span class="ans-header">PLAY [Configure campus network baseline] ********************</span>
+<span class="ans-task">TASK [Create VLANs] *****************************************</span>
+<span class="ans-changed">changed: [SW1]</span>
+<span class="ans-changed">changed: [SW2]</span>
+<span class="ans-header">PLAY RECAP **************************************************</span>
+<span class="ans-recap">SW1                : ok=1  changed=1  unreachable=0  failed=0</span>
+<span class="ans-recap">SW2                : ok=1  changed=1  unreachable=0  failed=0</span>
+
+<span class="y-comment"># SECOND RUN — idempotency: nothing changes</span>
+<span class="ans-task">TASK [Create VLANs] *****************************************</span>
+<span class="ans-ok">ok: [SW1]</span>
+<span class="ans-ok">ok: [SW2]</span>
+<span class="ans-header">PLAY RECAP **************************************************</span>
+<span class="ans-recap">SW1                : ok=1  <span class="ans-ok">changed=0</span>  unreachable=0  failed=0</span>
+<span class="ans-recap">SW2                : ok=1  <span class="ans-ok">changed=0</span>  unreachable=0  failed=0</span></pre>
+</div>
+</section>
+
+<section class="section-block" id="lab3" style="background:rgba(167,139,250,0.02)">
+<div class="section-eyebrow" style="color:var(--violet);border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.06)">⚙ GNS3 LAB 3</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:22px;color:var(--violet);margin-bottom:20px">NETCONF / RESTCONF API Interaction</h2>
+
+<div class="callout callout-fact"><span class="callout-label">🔬 Setup</span><span class="callout-text">Cisco IOS-XE (CSR1000V) with NETCONF/RESTCONF enabled. Enable on router: <code style="color:var(--green)">netconf-yang / restconf / ip http secure-server / ip http authentication local</code> | Install: <code style="color:var(--green)">pip3 install ncclient requests</code></span></div>
+
+<div class="code-block">
+  <div class="code-header"><span class="lang-label">Python — NETCONF get-config + RESTCONF GET interfaces</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+  <pre class="code-body"><span class="p-comment">## ── NETCONF via ncclient ─────────────────────────────</span>
+<span class="p-kw">from</span> ncclient <span class="p-kw">import</span> manager
+
+<span class="p-kw">with</span> manager.<span class="p-fn">connect</span>(
+    host=<span class="p-str">"sandbox-iosxe-latest-1.cisco.com"</span>,
+    port=<span class="p-num">830</span>,                      <span class="p-comment"># NETCONF port</span>
+    username=<span class="p-str">"developer"</span>,
+    password=<span class="p-str">"C1sco12345"</span>,
+    hostkey_verify=<span class="j-bool">False</span>
+) <span class="p-kw">as</span> m:
+    <span class="p-comment"># Get running configuration</span>
+    config = m.<span class="p-fn">get_config</span>(source=<span class="p-str">"running"</span>)
+    <span class="p-fn">print</span>(config.xml)              <span class="p-comment"># XML response</span>
+
+<span class="p-comment">## ── RESTCONF via requests ─────────────────────────────</span>
+<span class="p-kw">import</span> requests, urllib3
+urllib3.<span class="p-fn">disable_warnings</span>()
+
+BASE = <span class="p-str">"https://sandbox-iosxe-latest-1.cisco.com"</span>
+AUTH = (<span class="p-str">"developer"</span>, <span class="p-str">"C1sco12345"</span>)
+HDRS = {
+    <span class="j-key">"Accept"</span>: <span class="j-str">"application/yang-data+json"</span>,
+    <span class="j-key">"Content-Type"</span>: <span class="j-str">"application/yang-data+json"</span>
+}
+
+<span class="p-comment"># GET all interfaces</span>
+r = requests.<span class="p-fn">get</span>(
+    <span class="p-str">f"{BASE}/restconf/data/ietf-interfaces:interfaces"</span>,
+    auth=AUTH, headers=HDRS, verify=<span class="j-bool">False</span>
+)
+interfaces = r.<span class="p-fn">json</span>()[<span class="p-str">"ietf-interfaces:interfaces"</span>][<span class="p-str">"interface"</span>]
+<span class="p-kw">for</span> intf <span class="p-kw">in</span> interfaces:
+    <span class="p-fn">print</span>(<span class="p-str">f"{intf['name']:20} {intf.get('description','(no desc)')}"</span>)</pre>
+</div>
+</section>
+
+<section class="section-block" id="lab4" style="background:rgba(250,204,21,0.02)">
+<div class="section-eyebrow" style="color:var(--yellow);border-color:rgba(250,204,21,0.2);background:rgba(250,204,21,0.06)">⚙ GNS3 LAB 4</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:22px;color:var(--yellow);margin-bottom:20px">JSON Parsing, Filtering &amp; Error Handling</h2>
+
+<div class="code-block">
+  <div class="code-header"><span class="lang-label">Python — JSON Parse, Filter, Sort, Validate</span><button class="copy-btn" onclick="cpBlock(this)">📋 Copy</button></div>
+  <pre class="code-body"><span class="p-kw">import</span> json
+
+<span class="p-comment"># Simulated API response</span>
+raw = <span class="p-str">"""
+{
+  "response": [
+    {"hostname": "R1", "ip": "10.0.0.1", "status": "Reachable", "cpu": 45},
+    {"hostname": "R2", "ip": "10.0.0.2", "status": "Unreachable", "cpu": 0},
+    {"hostname": "R3", "ip": "10.0.0.3", "status": "Reachable", "cpu": 87}
+  ]
+}"""</span>
+
+data = json.<span class="p-fn">loads</span>(raw)
+devices = data[<span class="p-str">"response"</span>]
+
+<span class="p-comment"># Filter: only Reachable</span>
+reachable = [d <span class="p-kw">for</span> d <span class="p-kw">in</span> devices <span class="p-kw">if</span> d[<span class="p-str">"status"</span>] == <span class="p-str">"Reachable"</span>]
+
+<span class="p-comment"># Sort: by hostname alphabetically</span>
+sorted_devs = <span class="p-fn">sorted</span>(devices, key=<span class="p-kw">lambda</span> x: x[<span class="p-str">"hostname"</span>])
+
+<span class="p-comment"># Find high-CPU devices</span>
+high_cpu = [d <span class="p-kw">for</span> d <span class="p-kw">in</span> devices <span class="p-kw">if</span> d[<span class="p-str">"cpu"</span>] > <span class="p-num">80</span>]
+<span class="p-fn">print</span>(<span class="p-str">f"High CPU: {[d['hostname'] for d in high_cpu]}"</span>)
+
+<span class="p-comment"># Handle invalid JSON gracefully</span>
+broken = <span class="p-str">'{"hostname": "R1", "ip": "10.0.0.1",}'</span>  <span class="p-comment"># trailing comma!</span>
+<span class="p-kw">try</span>:
+    json.<span class="p-fn">loads</span>(broken)
+<span class="p-kw">except</span> json.JSONDecodeError <span class="p-kw">as</span> e:
+    <span class="p-fn">print</span>(<span class="p-str">f"JSON error at line {e.lineno}, col {e.colno}: {e.msg}"</span>)
+
+<span class="p-comment"># Write pretty JSON to file</span>
+<span class="p-kw">with</span> <span class="p-fn">open</span>(<span class="p-str">"devices.json"</span>, <span class="p-str">"w"</span>) <span class="p-kw">as</span> f:
+    json.<span class="p-fn">dump</span>(data, f, indent=<span class="p-num">2</span>)</pre>
+</div>
+</section>
+
+<!-- ════════════════════════════════════
+     FINAL EXAM REVIEW
+════════════════════════════════════ -->
+<section class="section-block" style="background:rgba(245,158,11,0.02)">
+<div class="section-eyebrow" style="color:var(--amber);border-color:rgba(245,158,11,0.2);background:rgba(245,158,11,0.06)">★ EXAM REVIEW</div>
+<h2 style="font-family:'Orbitron',monospace;font-size:22px;color:var(--amber);margin-bottom:24px">Section 6.0 — Master Summary</h2>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:24px">
+  <div class="card card-glow-blue" style="padding:18px">
+    <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);margin-bottom:12px">CRITICAL FACTS — ALL 7 TOPICS</div>
+    <ul style="list-style:none;font-size:12.5px;color:var(--text-dim);line-height:2.2">
+      <li style="color:var(--cyan)">▸ Configuration drift = devices diverging from intended state over time</li>
+      <li style="color:var(--cyan)">▸ SDN: control plane CENTRALIZED | data plane STAYS IN HARDWARE</li>
+      <li style="color:var(--cyan)">▸ Northbound API = apps → controller (REST) | Southbound = controller → devices (NETCONF)</li>
+      <li style="color:var(--cyan)">▸ NETCONF: XML, SSH port 830 | RESTCONF: JSON, HTTPS port 443</li>
+      <li style="color:var(--cyan)">▸ VXLAN: UDP 4789, 24-bit VNI = 16 million segments</li>
+      <li style="color:var(--cyan)">▸ Predictive AI: forecast from history | Generative AI: create from prompt</li>
+      <li style="color:var(--cyan)">▸ POST = Create = 201 = NOT idempotent (only non-idempotent verb)</li>
+      <li style="color:var(--cyan)">▸ 401 = authentication failed | 403 = authenticated, not authorized</li>
+      <li style="color:var(--cyan)">▸ DNA Center: X-Auth-Token | Meraki: X-Cisco-Meraki-API-Key</li>
+      <li style="color:var(--cyan)">▸ Ansible: Agentless · SSH · Push · YAML · No state file</li>
+      <li style="color:var(--cyan)">▸ Terraform: Declarative · HCL · State file · Plan/Apply workflow</li>
+      <li style="color:var(--cyan)">▸ Puppet/Chef: AGENT-BASED, PULL model (opposite of Ansible)</li>
+      <li style="color:var(--cyan)">▸ JSON booleans: lowercase true/false (not True/False)</li>
+      <li style="color:var(--cyan)">▸ JSON arrays = [] | objects = {} | no single quotes | no trailing commas</li>
+    </ul>
+  </div>
+  <div class="card card-glow-purple" style="padding:18px">
+    <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--red);margin-bottom:12px">TOP EXAM TRAPS — SECTION 6</div>
+    <div class="callout callout-exam" style="margin-bottom:8px;font-size:12px">🚨 SDN keeps data plane in HARDWARE — forwarding still happens at wire speed via ASICs. Only control plane moves to controller.</div>
+    <div class="callout callout-exam" style="margin-bottom:8px;font-size:12px">🚨 401 ≠ 403. 401 = "Who are you?" (no valid token). 403 = "I know you, but you can't do this" (no permission).</div>
+    <div class="callout callout-exam" style="margin-bottom:8px;font-size:12px">🚨 POST is NOT idempotent. Running POST twice creates two resources. All other common verbs are idempotent.</div>
+    <div class="callout callout-exam" style="margin-bottom:8px;font-size:12px">🚨 JSON booleans are lowercase: true/false. Python's True/False is invalid JSON. Common error on exam questions.</div>
+    <div class="callout callout-exam" style="margin-bottom:8px;font-size:12px">🚨 Ansible changed=0 on 2nd run is CORRECT BEHAVIOR (idempotency), not a failure. Exam may try to trick you here.</div>
+    <div class="callout callout-exam" style="font-size:12px">🚨 Northbound = ABOVE controller = REST APIs = apps talk to controller. Southbound = BELOW = NETCONF/OpenFlow = controller programs devices.</div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:40px;background:var(--bg-card);border:1px solid rgba(6,182,212,0.2);border-radius:8px">
+  <div style="font-family:'Orbitron',monospace;font-size:28px;color:var(--cyan);margin-bottom:8px">SECTION 6.0 — COMPLETE ✓</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);margin-bottom:20px">All 7 topics · 4 GNS3 Labs · 3 Interactive Tools · 28 Quiz Questions</div>
+  <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+    <span class="badge badge-blue">6.1 Automation ✓</span>
+    <span class="badge badge-cyan">6.2 SDN ✓</span>
+    <span class="badge badge-purple">6.3 Architecture ✓</span>
+    <span class="badge badge-violet">6.4 AI/ML ✓</span>
+    <span class="badge badge-amber">6.5 REST APIs ✓</span>
+    <span class="badge badge-red">6.6 Ansible/Terraform ✓</span>
+    <span class="badge badge-green">6.7 JSON ✓</span>
+  </div>
+</div>
+</section>
+
+</main>
+
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
+<script>
+/* ── Reading progress bar ── */
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress-bar').style.width = Math.min(pct,100) + '%';
+});
+
+/* ── Sidebar nav active highlighting ── */
+const allSections = document.querySelectorAll('[data-section]');
+const allNavLinks = document.querySelectorAll('.sb-link[data-id]');
+function updateNav() {
+  let cur = '';
+  allSections.forEach(s => { if (s.getBoundingClientRect().top <= 140) cur = s.dataset.section; });
+  allNavLinks.forEach(a => { a.classList.toggle('active', a.dataset.id === cur); });
+}
+window.addEventListener('scroll', updateNav, {passive:true});
+updateNav();
+
+/* ── Master toggle ── */
+const mastered = new Set();
+function toggleMaster(e, id) {
+  e.preventDefault(); e.stopPropagation();
+  const link = document.querySelector(`.sb-link[data-id="${id}"]`);
+  const btn  = link ? link.querySelector('.master-btn') : null;
+  if (!link) return;
+  if (mastered.has(id)) {
+    mastered.delete(id);
+    link.classList.remove('mastered');
+    if (btn) { btn.textContent = '✓'; btn.classList.remove('done'); }
+  } else {
+    mastered.add(id);
+    link.classList.add('mastered');
+    if (btn) { btn.textContent = '★'; btn.classList.add('done'); }
+  }
+  document.getElementById('mastered-count').textContent = mastered.size;
+  document.getElementById('progress-fill').style.width = Math.round(mastered.size/7*100) + '%';
+}
+
+/* ── Unified quiz handler ── */
+let quizScore = 0;
+function qa(btn, qid, r) {
+  const c = document.getElementById(qid);
+  if (!c) return;
+  c.querySelectorAll('.q-option').forEach(b => b.disabled = true);
+  const isCorrect = r === 'c';
+  if (isCorrect) {
+    btn.classList.add('correct');
+    quizScore++;
+    document.getElementById('score-display').textContent = quizScore;
+  } else {
+    btn.classList.add('wrong');
+    c.querySelectorAll('.q-option').forEach(b => {
+      if ((b.getAttribute('onclick')||'').includes("'c'")) b.classList.add('correct');
+    });
+  }
+  const ex = document.getElementById('exp-' + qid);
+  if (ex) ex.style.display = 'block';
+}
+
+/* ── Copy button ── */
+function cpBlock(btn) {
+  const pre = btn.closest('.code-block').querySelector('.code-body');
+  navigator.clipboard.writeText(pre.innerText.trim()).then(() => {
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = '📋 Copy', 2000);
+  });
+}
+
+/* ── Generative AI Demo ── */
+const genAIOutputs = {
+  ospf: [
+    '<span style="color:#fb923c">! Generated IOS configuration — OSPF area 0</span>',
+    '<span style="color:#4ade80">router ospf 1</span>',
+    '<span style="color:#94a3b8"> router-id 1.1.1.1</span>',
+    '<span style="color:#94a3b8"> network 10.0.0.0 0.255.255.255 area 0</span>',
+    '<span style="color:#94a3b8"> passive-interface GigabitEthernet0/0</span>',
+    '<span style="color:#94a3b8"> auto-cost reference-bandwidth 10000</span>',
+    '<span style="color:#60a5fa">! Validated: syntax correct, no conflicts detected.</span>'
+  ],
+  vlan: [
+    '<span style="color:#fb923c">! Generated IOS configuration — VLAN 10</span>',
+    '<span style="color:#4ade80">vlan 10</span>',
+    '<span style="color:#94a3b8"> name Sales</span>',
+    '<span style="color:#4ade80">interface vlan 10</span>',
+    '<span style="color:#94a3b8"> description Sales Department SVI</span>',
+    '<span style="color:#94a3b8"> ip address 192.168.10.1 255.255.255.0</span>',
+    '<span style="color:#94a3b8"> no shutdown</span>',
+    '<span style="color:#60a5fa">! Validated: VLAN ID available, SVI created.</span>'
+  ],
+  syslog: [
+    '<span style="color:#c084fc">! AI Syslog Analysis</span>',
+    '<span style="color:#f8fafc">What happened: OSPF neighbor 2.2.2.2 on Gi0/0</span>',
+    '<span style="color:#f8fafc">dropped from FULL state to DOWN.</span>',
+    '',
+    '<span style="color:#fb923c">Likely causes:</span>',
+    '<span style="color:#94a3b8">1. Dead timer expired (no hellos received)</span>',
+    '<span style="color:#94a3b8">2. Interface Gi0/0 went down</span>',
+    '<span style="color:#94a3b8">3. Hello/Dead timer mismatch</span>',
+    '',
+    '<span style="color:#4ade80">Troubleshoot: show ip ospf neighbor</span>',
+    '<span style="color:#4ade80">              show ip ospf interface Gi0/0</span>',
+    '<span style="color:#4ade80">              debug ip ospf adj</span>'
+  ]
+};
+
+function runGenAI() {
+  const sel = document.getElementById('genai-prompt').value;
+  const out = document.getElementById('genai-output');
+  const lines = genAIOutputs[sel] || [];
+  out.innerHTML = '';
+  let i = 0;
+  const timer = setInterval(() => {
+    if (i >= lines.length) { clearInterval(timer); return; }
+    out.innerHTML += lines[i] + '\n';
+    out.scrollTop = out.scrollHeight;
+    i++;
+  }, 120);
+}
+
+/* ── REST API Console ── */
+const apiExamples = {
+  devices: {
+    method: 'GET', url: '/dna/intent/api/v1/network-device',
+    status: '200 OK',
+    color: '#22c55e',
+    body: `{
+  <span class="j-key">"response"</span>: [
+    {
+      <span class="j-key">"hostname"</span>: <span class="j-str">"leaf1.abc.inc"</span>,
+      <span class="j-key">"managementIpAddress"</span>: <span class="j-str">"10.10.22.66"</span>,
+      <span class="j-key">"platformId"</span>: <span class="j-str">"C9KV-UADP-8P"</span>,
+      <span class="j-key">"reachabilityStatus"</span>: <span class="j-str">"Reachable"</span>,
+      <span class="j-key">"managed"</span>: <span class="j-bool">true</span>,
+      <span class="j-key">"interfaceCount"</span>: <span class="j-num">8</span>
+    }
+  ],
+  <span class="j-key">"version"</span>: <span class="j-str">"1.0"</span>
+}`
+  },
+  post: {
+    method: 'POST', url: '/dna/intent/api/v1/template-programmer/template',
+    status: '201 Created',
+    color: '#3b82f6',
+    body: `{
+  <span class="j-key">"id"</span>: <span class="j-str">"7a8b2c9d-1234-5678-abcd"</span>,
+  <span class="j-key">"name"</span>: <span class="j-str">"NTP-Config-Template"</span>,
+  <span class="j-key">"createTime"</span>: <span class="j-num">1706788200</span>,
+  <span class="j-key">"status"</span>: <span class="j-str">"created"</span>
+}`
+  },
+  delete: {
+    method: 'DELETE', url: '/dna/intent/api/v1/network-device/abc-123',
+    status: '204 No Content',
+    color: '#22c55e',
+    body: '<span style="color:#94a3b8">// 204 — No Content body returned on successful DELETE</span>'
+  },
+  '401': {
+    method: 'GET', url: '/dna/intent/api/v1/network-device',
+    status: '401 Unauthorized',
+    color: '#f97316',
+    body: `{
+  <span class="j-key">"response"</span>: {
+    <span class="j-key">"errorCode"</span>: <span class="j-str">"NCOB01207"</span>,
+    <span class="j-key">"message"</span>: <span class="j-str">"Authentication failed"</span>,
+    <span class="j-key">"detail"</span>: <span class="j-str">"Token is missing or invalid. POST to /auth/token first."</span>
+  }
+}`
+  }
+};
+
+function loadEx(key) {
+  const ex = apiExamples[key];
+  if (!ex) return;
+  document.getElementById('api-method').value = ex.method;
+  document.getElementById('api-url').value = ex.url;
+}
+
+function runApi() {
+  const method = document.getElementById('api-method').value;
+  const url    = document.getElementById('api-url').value;
+  const panel  = document.getElementById('api-response-panel');
+  const badge  = document.getElementById('api-status-badge');
+
+  // Find matching example
+  let ex = null;
+  for (const key in apiExamples) {
+    if (apiExamples[key].method === method && apiExamples[key].url === url) {
+      ex = apiExamples[key]; break;
+    }
+  }
+  if (!ex) ex = apiExamples.devices;
+
+  panel.innerHTML = '<span style="color:#94a3b8">Sending request...</span>';
+  badge.textContent = '...';
+  badge.className = 'badge badge-blue';
+
+  setTimeout(() => {
+    badge.textContent = ex.status;
+    badge.className = ex.status.startsWith('2') ? 'badge badge-green' : ex.status.startsWith('4') ? 'badge badge-orange' : 'badge badge-red';
+    badge.style.color = ex.color;
+    panel.innerHTML = ex.body;
+  }, 500);
+}
+
+/* ── Ansible Simulator ── */
+function runAnsible(run) {
+  const out = document.getElementById('ansible-output');
+  out.innerHTML = '';
+  let lines;
+  if (run === 1) {
+    lines = [
+      ['ans-header', 'PLAY [Configure VLANs on all switches] ***************'],
+      ['ans-task',   'TASK [Gathering Facts] ******************************'],
+      ['ans-ok',     'ok: [SW1]'],
+      ['ans-ok',     'ok: [SW2]'],
+      ['ans-ok',     'ok: [SW3]'],
+      ['ans-task',   'TASK [Create VLANs] *********************************'],
+      ['ans-changed','changed: [SW1]   → VLAN 10 created'],
+      ['ans-changed','changed: [SW2]   → VLAN 10,20 created'],
+      ['ans-changed','changed: [SW3]   → VLAN 10,20,30 created'],
+      ['ans-header', 'PLAY RECAP ******************************************'],
+      ['ans-recap',  'SW1 : ok=2  changed=1  unreachable=0  failed=0'],
+      ['ans-recap',  'SW2 : ok=2  changed=1  unreachable=0  failed=0'],
+      ['ans-recap',  'SW3 : ok=2  changed=1  unreachable=0  failed=0'],
+      ['ans-ok',     ''],
+      ['ans-ok',     '✓ Playbook complete — configs applied to 3 switches']
+    ];
+  } else if (run === 2) {
+    lines = [
+      ['ans-header', 'PLAY [Configure VLANs] ← 2nd run (idempotency demo)'],
+      ['ans-task',   'TASK [Create VLANs] *********************************'],
+      ['ans-ok',     'ok: [SW1]   → already configured, no change needed'],
+      ['ans-ok',     'ok: [SW2]   → already configured, no change needed'],
+      ['ans-ok',     'ok: [SW3]   → already configured, no change needed'],
+      ['ans-header', 'PLAY RECAP ******************************************'],
+      ['ans-recap',  'SW1 : ok=1  changed=0  unreachable=0  failed=0'],
+      ['ans-recap',  'SW2 : ok=1  changed=0  unreachable=0  failed=0'],
+      ['ans-recap',  'SW3 : ok=1  changed=0  unreachable=0  failed=0'],
+      ['ans-ok',     ''],
+      ['ans-ok',     '✓ IDEMPOTENCY — changed=0 means config is already correct!'],
+      ['ans-ok',     '  This is EXPECTED behavior, not a problem.']
+    ];
+  } else {
+    lines = [
+      ['ans-header', 'PLAY [Configure VLANs] ******************************'],
+      ['ans-task',   'TASK [Create VLANs] *********************************'],
+      ['ans-ok',     'ok: [SW1]'],
+      ['ans-failed', 'FAILED! [SW2] → YAML syntax error: unexpected ":" at line 12'],
+      ['ans-failed', 'FAILED! [SW3] → Cannot reach host (timeout)'],
+      ['ans-header', 'PLAY RECAP ******************************************'],
+      ['ans-recap',  'SW1 : ok=1  changed=0  failed=0'],
+      ['ans-failed', 'SW2 : ok=0  changed=0  failed=1'],
+      ['ans-failed', 'SW3 : ok=0  changed=0  unreachable=1  failed=0'],
+      ['ans-failed', ''],
+      ['ans-failed', '✗ Playbook failed — check YAML syntax and connectivity']
+    ];
+  }
+  let i = 0;
+  const timer = setInterval(() => {
+    if (i >= lines.length) { clearInterval(timer); return; }
+    const [cls, text] = lines[i];
+    out.innerHTML += `<span class="${cls}">${text}</span>\n`;
+    out.scrollTop = out.scrollHeight;
+    i++;
+  }, 150);
+}
+
+/* ── JSON Tree Visualizer ── */
+function typeOf(v) {
+  if (v === null) return 'null';
+  if (Array.isArray(v)) return 'array';
+  return typeof v;
+}
+
+const typeColors = {
+  string: '#4ade80', number: '#fb923c', boolean: '#a78bfa',
+  null: '#94a3b8', array: '#c084fc', object: '#22d3ee'
+};
+
+function renderNode(key, value, depth) {
+  const type = typeOf(value);
+  const indent = '  '.repeat(depth);
+  const color = typeColors[type] || '#f8fafc';
+  const badge = `<span style="font-size:9px;padding:1px 5px;border-radius:2px;background:rgba(255,255,255,0.07);color:${color};margin-left:6px;font-family:'JetBrains Mono',monospace">${type}</span>`;
+  const keyStr = key !== null ? `<span style="color:#60a5fa">"${key}"</span>: ` : '';
+
+  if (type === 'object' && value !== null) {
+    const entries = Object.entries(value);
+    const childrenHTML = entries.map(([k,v]) => renderNode(k, v, depth+1)).join('');
+    return `<div style="padding-left:${depth*14}px">${keyStr}<span style="color:#f8fafc">{}</span> ${badge}<div style="border-left:1px solid rgba(255,255,255,0.07);margin-left:6px">${childrenHTML}</div></div>`;
+  } else if (type === 'array') {
+    const childrenHTML = value.map((v,i) => renderNode(i, v, depth+1)).join('');
+    return `<div style="padding-left:${depth*14}px">${keyStr}<span style="color:#f8fafc">[ ${value.length} items ]</span> ${badge}<div style="border-left:1px solid rgba(255,255,255,0.07);margin-left:6px">${childrenHTML}</div></div>`;
+  } else {
+    const display = type === 'string' ? `"${value}"` : String(value);
+    return `<div style="padding-left:${depth*14}px">${keyStr}<span style="color:${color}">${display}</span> ${badge}</div>`;
+  }
+}
+
+function updateJSONTree() {
+  const input = document.getElementById('json-input').value;
+  const tree = document.getElementById('json-tree');
+  const status = document.getElementById('json-status');
+  try {
+    const parsed = JSON.parse(input);
+    tree.innerHTML = renderNode(null, parsed, 0);
+    status.style.color = 'var(--green)';
+    status.textContent = '✓ Valid JSON';
+  } catch(e) {
+    tree.innerHTML = `<span style="color:var(--red)">✗ Parse error: ${e.message}</span>`;
+    status.style.color = 'var(--red)';
+    status.textContent = `✗ ${e.message}`;
+  }
+}
+
+function validateJSON() { updateJSONTree(); }
+
+function breakJSON() {
+  const ta = document.getElementById('json-input');
+  ta.value = `{
+  "response": [
+    {
+      'hostname': 'R1.company.local',
+      "ip": "192.168.1.1",
+      "managed": True,
+      "count": 4,
+    }
+  ],
+  "version": 1.0
+}`;
+  updateJSONTree();
+}
+
+// Initialize JSON tree on load
+updateJSONTree();
+
+/* ── Mobile menu ── */
+document.addEventListener('click', e => {
+  const sb  = document.getElementById('sidebar');
+  const btn = document.getElementById('menu-btn');
+  if (!sb.contains(e.target) && !btn.contains(e.target)) sb.classList.remove('open');
+});
+</script>
+</body>
+</html>
